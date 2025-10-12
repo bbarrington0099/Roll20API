@@ -253,10 +253,22 @@ function setupNPCProximity() {
         // Listen for API commands to add NPCs to monitoring
         if (msg.type == "api" && msg.content.startsWith("!proximitynpc")) {
             if (msg.content.includes("--monitor") || msg.content.includes("-M")) {
-                handleMonitorNPC(msg);
+                let args = msg.content.trim().split(" ");
+
+                // If more than 3 args, treat as edit call
+                if (args.length > 3) {
+                    handleEditMonitoredNPC(msg);
+                } else {
+                    handleMonitorNPC(msg);
+                }
                 return;
             }
-            
+
+            if (msg.content.includes("--edit") || msg.content.includes("-e")) {
+                handleEditMonitoredNPC(msg);
+                return;
+            }
+
             if (msg.content.includes("--menu") || msg.content.includes("-m")) {
                 handleProximityNPCMenu(msg);
                 return;
@@ -297,7 +309,7 @@ function setupNPCProximity() {
     });
 }
 
-function createMonitoredNPCFromToken(token) {
+function createMonitoredNPCFromToken(msg, token) {
     if (!state.ProximityNPC.monitoredNPCs[token.id]) {
         state.ProximityNPC.monitoredNPCs[token.id] = 
             new MonitoredNPC(
@@ -313,10 +325,27 @@ function createMonitoredNPCFromToken(token) {
                 state.ProximityNPC.cardStyles[0].name || 'Default'
             );
     }
-    showEditMonitorNPCDialog(token);
+    showEditMonitorNPCDialog(msg, token);
 }
 
-function showEditMonitorNPCDialog(token) {
+function showEditMonitorNPCDialog(msg, token) {
+    let properties = [
+        { name: 'Trigger Distance (body widths)', type: 'number', attr: 'triggerDistance'},
+        { name: 'Timeout (ms, 0 permanent)', type: 'number', attr: 'timeout'},
+        { name: 'Image URL', type: 'text', attr: 'img'},
+        { name: 'Card Style', type: 'select', attr: 'cardStyle', options: state.ProximityNPC.cardStyles.map(style => style.name)},
+        { name: 'Messages', type: 'messages', attr: 'messages'}
+    ];
+
+    let monitoredNPC = state.ProximityNPC.monitoredNPCs[token.id];
+    if (!monitoredNPC) {
+        sendChat("NPC Monitor", "/w gm Could not find monitored NPC for " + token.get('name'));
+        return;
+    }
+
+    sendChat("NPC Monitor", `/w gm &{template:default} {{name=Edit Monitored NPC: ${monitoredNPC.name}}} ${properties.map((prop) => {
+        return `{{[${prop.name}](!proximitynpc -M ${monitoredNPC.name.replace(" ", "_").trim()} ${prop.attr})}}`
+    }).join(" ")}`);
 }
 
 function showHelpMessage(msg = {who: "gm"}) {
@@ -324,6 +353,94 @@ function showHelpMessage(msg = {who: "gm"}) {
 
     sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=NPC Proximity Monitor Help}} {{!proximitynpc=Main call required before args}} {{--monitor | -M=Requires token to be selected, ensures the token is monitored up to date and opens the editing menu}} {{--list | -l=Lists all currently monitored NPC tokens}} {{--menu | -m=Opens the main menu for managing ProximityNPC}} {{--help | -h=Displays this help message}}`);
     return;
+}
+
+/* !proximitynpc --edit NPC_Name prop value */
+function handleEditMonitoredNPC(msg) {
+    let who = msg.who || "gm";
+    let args = msg.content.trim().split(" "); 
+    
+    let npcName = args[2].replace("_", " ").trim();
+    if (args.length < 4) {
+        let tokenId = msg.selected[0]._id;
+        let token = getObj('graphic', tokenId);
+        showEditMonitorNPCDialog(msg, token);
+        return;
+    }
+
+    let property = args[3].toLowerCase();
+    if (args.length < 5) {
+        let promptMessage = "";
+
+        switch(property) {
+            case 'triggerdistance':
+                promptMessage = "Enter a new trigger distance ^in body widths^:";
+                break;
+            case 'timeout':
+                promptMessage = "Enter a new timeout value ^ms, 0 permanent^:";
+                break;
+            case 'img':
+                promptMessage = "Paste the new image URL:";
+                break;
+            case 'cardstyle':
+                promptMessage = "Enter a card style name ^use !proximitynpc --cardstyles to list^:";
+                break;
+            default:
+                sendChat("NPC Monitor", `/w ${who} Unknown property: ${property}`);
+                return;
+        }
+
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set ${property} for ${npcName}}} {{${promptMessage}=[Click Here](!proximitynpc -M ${npcName.replace(" ", "_")} ${property} ?{${promptMessage}})}}`);
+        return;
+    }
+
+    let value = args.slice(4).join(" ").trim();
+
+    let monitoredNPC = Object.values(state.ProximityNPC.monitoredNPCs).find(npc => npc.name.trim() === npcName);
+
+    if (!monitoredNPC) {
+        sendChat("NPC Monitor", "/w " + who + " Could not find monitored NPC with name: " + npcName);
+        return;
+    }
+
+    switch (property) {
+        case 'triggerdistance':
+            let distance = parseFloat(value);
+            if (isNaN(distance) || distance <= 0) {
+                sendChat("NPC Monitor", "/w " + who + " Invalid distance value. Must be a positive number.");
+                monitoredNPC.triggerDistance = state.ProximityNPC.defaultDistance || 2;
+                return;
+            }
+            monitoredNPC.triggerDistance = distance;
+            sendChat("NPC Monitor", "/w " + who + " Updated " + monitoredNPC.name + " trigger distance to " + distance);
+            return;
+        case 'timeout':
+            let timeout = parseInt(value);
+            if (isNaN(timeout) || timeout < 0) {
+                sendChat("NPC Monitor", "/w " + who + " Invalid timeout value. Must be a non-negative integer.");
+                monitoredNPC.timeout = state.ProximityNPC.defaultTimeout || 10000;
+                return;
+            }
+            monitoredNPC.timeout = timeout;
+            sendChat("NPC Monitor", "/w " + who + " Updated " + monitoredNPC.name + " timeout to " + timeout + " ms");
+            return;
+        case 'img':
+            monitoredNPC.img = value;
+            sendChat("NPC Monitor", "/w " + who + " Updated " + monitoredNPC.name + " image URL.");
+            return;
+        case 'cardstyle':
+            let cardStyle = state.ProximityNPC.cardStyles.find(style => style.name.toLowerCase() === value.toLowerCase());
+            if (!cardStyle) {
+                sendChat("NPC Monitor", "/w " + who + " Invalid card style name. Use !proximitynpc --cardstyles to list available styles.");
+                return;
+            }
+            monitoredNPC.cardStyle = cardStyle.name;
+            sendChat("NPC Monitor", "/w " + who + " Updated " + monitoredNPC.name + " card style to " + cardStyle.name);
+            return;
+        default:
+            sendChat("NPC Monitor", "/w " + who + " Unknown property: " + property + ". Valid properties are: triggerdistance, timeout, img, cardstyle.");
+            return;
+    }
 }
 
 function handleProximityNPCMenu(msg) {
@@ -334,7 +451,7 @@ function handleProximityNPCMenu(msg) {
 }
 
 function handleListMonitoredNPCs(msg) {
-    let who = msg.who;
+    let who = msg.who || "gm";
 
     let monitoredNPCs = Object.values(state.ProximityNPC.monitoredNPCs);
 
@@ -343,9 +460,9 @@ function handleListMonitoredNPCs(msg) {
         return;
     }
 
-    let list = monitoredNPCs.map(npc => `- ${npc.name} (Distance: ${npc.triggerDistance}, Timeout: ${npc.timeout} ms, Messages: ${npc.messages.length}, CardStyle: ${npc.cardStyle})`).join('\n');
+    let list = monitoredNPCs.map(npc => `{{[${npc.name}](!proximitynpc -M ${npc.name.replace(" ", "_").trim()})=(Distance: ${npc.triggerDistance}, Timeout: ${npc.timeout} ms, Messages: ${npc.messages.length}, CardStyle: ${npc.cardStyle})}}`).join(' ');
 
-    sendChat("NPC Monitor", "/w " + who + " Currently monitored NPCs:\n" + list);
+    sendChat("NPC Monitor", "/w " + who + "&{template:default} {{name=NPC Proximity Monitor List}} "  + list);
     return;
 }
 
@@ -386,14 +503,17 @@ function handleMonitorNPC(msg) {
     let who = msg.who;
 
     // If there is no token selected, show help message
-    if (!msg.selected || msg.selected.length === 0) {
+    if (msg.content.trim().split(" ").length < 3) {
         sendChat("NPC Monitor", "/w " + who + " Please select a token to monitor.");
         showHelpMessage();
         return;
     }
 
-    let tokenId = msg.selected[0]._id;
-    let token = getObj('graphic', tokenId);
+    let characterName = msg.content.trim().split(" ")[2].replace("_", " ").trim();
+    const character = findObjs({type:'character',name: characterName})
+        .filter(c=>c.get('controlledby').split(/\w*,\w*/).includes(msg.playerid))[0];
+    
+    let token = findObjs({type: 'graphic', represents: character.id})[0];
 
     if (!token) {
         sendChat("NPC Monitor", "/w " + who + " Could not find selected token.");
@@ -401,11 +521,12 @@ function handleMonitorNPC(msg) {
     }
 
     let tokenName = token.get('name');
+    let tokenId = token.id;
 
     // If token is not already monitored, create a new monitored NPC entry and show dialog to configure
     if (!state.ProximityNPC.monitoredNPCs[tokenId]) {
-        createMonitoredNPCFromToken(token);
-        showEditMonitorNPCDialog(who, token);
+        createMonitoredNPCFromToken(msg, token);
+        showEditMonitorNPCDialog(msg, token);
         return;
     }
 
@@ -430,7 +551,7 @@ function handleMonitorNPC(msg) {
         monitoredNPC.cardStyle || 'Default'
     );
 
-    showEditMonitorNPCDialog(who, token);
+    showEditMonitorNPCDialog(msg, token);
 }
 
 /**
