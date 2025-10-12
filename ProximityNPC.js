@@ -266,6 +266,7 @@ function setupNPCProximity() {
 
             if (msg.content.includes("--edit") || msg.content.includes("-e")) {
                 handleEditMonitoredNPC(msg);
+                handleListMonitoredNPCs(msg);
                 return;
             }
 
@@ -289,8 +290,18 @@ function setupNPCProximity() {
                 return;
             }
 
+            if (msg.content.includes("--cardstyle") || msg.content.includes("-C")) {
+                handleEditCardStyle(msg);
+                return;
+            }
+
             if (msg.content.includes("--trigger") || msg.content.includes("-t")) {
                 handleTriggerNPC(msg);
+                return;
+            }
+
+            if (msg.content.includes("--delete") || msg.content.includes("-D")) {
+                handleDeleteMonitor(msg);
                 return;
             }
             
@@ -328,6 +339,14 @@ function createMonitoredNPCFromToken(msg, token) {
     showEditMonitorNPCDialog(msg, token);
 }
 
+function toSafeName(name) {
+    return name.trim().replace(/\s+/g, "_");
+}
+
+function fromSafeName(safeName) {
+    return safeName.replace(/_/g, " ").trim();
+}
+
 function showEditMonitorNPCDialog(msg, token) {
     let properties = [
         { name: 'Trigger Distance (body widths)', type: 'number', attr: 'triggerDistance'},
@@ -343,9 +362,10 @@ function showEditMonitorNPCDialog(msg, token) {
         return;
     }
 
+    let safeNPCName = toSafeName(monitoredNPC.name);
     sendChat("NPC Monitor", `/w gm &{template:default} {{name=Edit Monitored NPC: ${monitoredNPC.name}}} ${properties.map((prop) => {
-        return `{{[${prop.name}](!proximitynpc -M ${monitoredNPC.name.replace(" ", "_").trim()} ${prop.attr})}}`
-    }).join(" ")}`);
+        return `{{[${prop.name}](!proximitynpc -M ${safeNPCName} ${prop.attr})}}`
+    }).join(" ")} {{[Delete](!proximitynpc -D ${safeNPCName})}}`);
 }
 
 function showHelpMessage(msg = {who: "gm"}) {
@@ -355,12 +375,275 @@ function showHelpMessage(msg = {who: "gm"}) {
     return;
 }
 
+/* !proximitynpc --C Style_Name prop value */
+/* !proximitynpc --C Style_Name prop value */
+/* !proximitynpc --C Style_Name prop value */
+function handleEditCardStyle(msg) {
+    let who = msg.who || "gm";
+    let args = msg.content.trim().split(" ");
+    
+    // Handle creating new card style
+    if (args.length >= 3 && (args[2].toLowerCase() === 'new' || args[2].toLowerCase() === 'create')) {
+        let styleName = fromSafeName(args.slice(3).join(" "));
+        
+        if (!styleName) {
+            sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Create New Card Style}} {{Enter style name=[Click Here](!proximitynpc -C new ?{Style Name})}}`);
+            return;
+        }
+        
+        // Check if style already exists
+        if (state.ProximityNPC.cardStyles.find(style => style.name.toLowerCase() === styleName.toLowerCase())) {
+            sendChat("NPC Monitor", `/w ${who} Card style "${styleName}" already exists.`);
+            return;
+        }
+        
+        // Create new card style with default colors
+        let newStyle = new CardStyle(styleName);
+        state.ProximityNPC.cardStyles.push(newStyle);
+        
+        sendChat("NPC Monitor", `/w ${who} Created new card style: "${styleName}".`);
+        handleEditCardStyle({
+            content: `!proximitynpc -C ${toSafeName(style.name)}`,
+            who: who
+        })
+        return;
+    }
+    
+    // Handle deleting card style
+    if (args.length >= 3 && (args[2].toLowerCase() === 'delete' || args[2].toLowerCase() === 'remove')) {
+        if (args.length < 4) {
+            // Show clickable menu of styles to delete (excluding Default)
+            let deletableStyles = state.ProximityNPC.cardStyles.filter(style => style.name !== 'Default');
+            
+            if (deletableStyles.length === 0) {
+                sendChat("NPC Monitor", `/w ${who} No card styles can be deleted (Default style is protected).`);
+                return;
+            }
+            
+            let styleList = deletableStyles.map(style => 
+                `{{[${style.name}](!proximitynpc -C delete ${toSafeName(style.name)})}}`
+            ).join(' ');
+            
+            sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Delete Card Style}} ${styleList}`);
+            return;
+        }
+        
+        let styleName = args.slice(3).join(" ").replace("_", " ").trim();
+        
+        // Prevent deletion of Default style
+        if (styleName.toLowerCase() === 'default') {
+            sendChat("NPC Monitor", `/w ${who} Cannot delete the Default card style.`);
+            return;
+        }
+        
+        let styleIndex = state.ProximityNPC.cardStyles.findIndex(style => style.name.toLowerCase() === styleName.toLowerCase());
+        
+        if (styleIndex === -1) {
+            sendChat("NPC Monitor", `/w ${who} Could not find card style: ${styleName}`);
+            return;
+        }
+        
+        // Check if any NPCs are using this style
+        let npcsUsingStyle = [];
+        Object.values(state.ProximityNPC.monitoredNPCs).forEach(npc => {
+            if (npc.cardStyle === state.ProximityNPC.cardStyles[styleIndex].name) {
+                npcsUsingStyle.push(npc.name);
+            }
+        });
+        
+        state.ProximityNPC.presetNPCs.forEach(npc => {
+            if (npc.cardStyle === state.ProximityNPC.cardStyles[styleIndex].name) {
+                npcsUsingStyle.push(npc.name);
+            }
+        });
+        
+        if (npcsUsingStyle.length > 0) {
+            sendChat("NPC Monitor", `/w ${who} Cannot delete "${styleName}" - it's being used by: ${npcsUsingStyle.join(', ')}. Change their card styles first.`);
+            return;
+        }
+        
+        let deletedStyle = state.ProximityNPC.cardStyles.splice(styleIndex, 1)[0];
+        sendChat("NPC Monitor", `/w ${who} Deleted card style: "${deletedStyle.name}"`);
+        return;
+    }
+    
+    // If no style name provided, show list of styles for editing
+    if (args.length < 3) {
+        let styleList = state.ProximityNPC.cardStyles.map(style => 
+            `{{[${style.name}](!proximitynpc -C ${toSafeName(style.name)})}}`
+        ).join(' ');
+        
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Edit Card Styles}} {{[Create New](!proximitynpc -C new)}} ${styleList}`);
+        return;
+    }
+    
+    let styleName = args[2].replace("_", " ").trim();
+    let cardStyle = state.ProximityNPC.cardStyles.find(style => style.name.toLowerCase() === styleName.toLowerCase());
+    
+    if (!cardStyle) {
+        sendChat("NPC Monitor", `/w ${who} Could not find card style: ${styleName}. Use !proximitynpc --cardstyles to see available styles.`);
+        return;
+    }
+    
+    // If no property specified, show edit dialog with clickable properties
+    if (args.length < 4) {
+        // Don't allow editing of Default style properties
+        if (cardStyle.name === 'Default') {
+            sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Card Style: ${cardStyle.name}}} {{This is the default style and cannot be edited.}} {{[Create New Style](!proximitynpc -C new)}}`);
+            return;
+        }
+        
+        let properties = [
+            { name: 'Border Color', type: 'color', attr: 'borderColor', value: cardStyle.borderColor },
+            { name: 'Background Color', type: 'color', attr: 'backgroundColor', value: cardStyle.backgroundColor },
+            { name: 'Bubble Color', type: 'color', attr: 'bubbleColor', value: cardStyle.bubbleColor },
+            { name: 'Text Color', type: 'color', attr: 'textColor', value: cardStyle.textColor }
+        ];
+        
+        let propertyLinks = properties.map(prop => 
+            `{{[${prop.name}: ${prop.value}](!proximitynpc -C ${toSafeName(cardStyle.name)} ${prop.attr})}}`
+        ).join(" ");
+        
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Edit Card Style: ${cardStyle.name}}} ${propertyLinks} {{[Delete Style](!proximitynpc -C delete ${toSafeName(cardStyle.name)})}}`);
+        return;
+    }
+    
+    let property = args[3].toLowerCase();
+    
+    // Prevent editing Default style properties
+    if (cardStyle.name === 'Default') {
+        sendChat("NPC Monitor", `/w ${who} Cannot edit properties of the Default card style.`);
+        return;
+    }
+    
+    // If no value provided, show input prompt with current value as default
+    if (args.length < 5) {
+        let promptMessage = "";
+        let currentValue = cardStyle[property];
+        
+        switch(property) {
+            case 'bordercolor':
+                promptMessage = "Enter border color ^any CSS color - red, #ff0000, rgb^255,0,0^, etc.^:";
+                break;
+            case 'backgroundcolor':
+                promptMessage = "Enter background color ^any CSS color^:";
+                break;
+            case 'bubblecolor':
+                promptMessage = "Enter speech bubble color ^any CSS color^:";
+                break;
+            case 'textcolor':
+                promptMessage = "Enter text color ^any CSS color^:";
+                break;
+            default:
+                sendChat("NPC Monitor", `/w ${who} Unknown property: ${property}. Valid properties: borderColor, backgroundColor, bubbleColor, textColor`);
+                return;
+        }
+        
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set ${property} for ${cardStyle.name}}} {{Current: ${currentValue}}} {{${promptMessage}=[Click Here](!proximitynpc -C ${toSafeName(cardStyle.name)} ${property} ?{${promptMessage}|${currentValue}})}}`);
+        return;
+    }
+    
+    let value = args.slice(4).join(" ").trim();
+    
+    // No validation - accept any string as CSS will handle validation at runtime
+    // This allows color names, hex, rgb(), hsl(), etc.
+    
+    switch(property) {
+        case 'bordercolor':
+            cardStyle.borderColor = value;
+            sendChat("NPC Monitor", `/w ${who} Updated ${cardStyle.name} border color to "${value}"`);
+            break;
+        case 'backgroundcolor':
+            cardStyle.backgroundColor = value;
+            sendChat("NPC Monitor", `/w ${who} Updated ${cardStyle.name} background color to "${value}"`);
+            break;
+        case 'bubblecolor':
+            cardStyle.bubbleColor = value;
+            sendChat("NPC Monitor", `/w ${who} Updated ${cardStyle.name} bubble color to "${value}"`);
+            break;
+        case 'textcolor':
+            cardStyle.textColor = value;
+            sendChat("NPC Monitor", `/w ${who} Updated ${cardStyle.name} text color to "${value}"`);
+            break;
+        default:
+            sendChat("NPC Monitor", `/w ${who} Unknown property: ${property}. Valid properties: borderColor, backgroundColor, bubbleColor, textColor`);
+            return;
+    }
+    
+    // Show the updated edit dialog
+    sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Card Style Updated}} {{[Continue Editing ${cardStyle.name}](!proximitynpc -C ${toSafeName(cardStyle.name)})}}`);
+}
+
+// Also update the handleListCardStyles function to be more interactive
+function handleListCardStyles(msg) {
+    let who = msg.who || "gm";
+
+    let styleList = state.ProximityNPC.cardStyles.map(style => 
+        `{{[${style.name}](!proximitynpc -C ${toSafeName(style.name)})}}`
+    ).join(' ');
+
+    sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=NPC Proximity Monitor Card Styles}} {{[Create New](!proximitynpc -C new)}} ${styleList}`);
+}
+
+/* !proximitynpc --delete NPC_Name */
+function handleDeleteMonitor(msg) {
+    let who = msg.who || "gm";
+    let args = msg.content.trim().split(" ");
+
+    // If no NPC name is given, show a clickable menu of monitored NPCs
+    if (args.length < 3) {
+        let monitoredNPCs = Object.values(state.ProximityNPC.monitoredNPCs);
+        if (monitoredNPCs.length === 0) {
+            sendChat("NPC Monitor", `/w ${who} No NPCs are currently being monitored.`);
+            return;
+        }
+
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=NPC Proximity Monitor Delete}} ` +
+            monitoredNPCs.map(npc => {
+                let safeName = toSafeName(npc.name);
+                return `{{[${npc.name}](!proximitynpc -D ${safeName})}}`;
+            }))
+        return;
+    }
+
+    // Otherwise, delete the specific NPC
+    // Parsing argument safely
+    let npcName = fromSafeName(args[2]);
+
+    // When generating delete menu
+    
+
+    let npcEntry = Object.entries(state.ProximityNPC.monitoredNPCs)
+        .find(([tokenId, npc]) => npc.name.trim() === npcName);
+
+    if (!npcEntry) {
+        sendChat("NPC Monitor", `/w ${who} Could not find monitored NPC with name: ${npcName}`);
+        return;
+    }
+
+    let [tokenId, npc] = npcEntry;
+
+    // Remove from monitored list
+    delete state.ProximityNPC.monitoredNPCs[tokenId];
+
+    // Remove any pending triggers for this NPC
+    Object.keys(triggeredTokens).forEach(key => {
+        if (key.endsWith(`_${tokenId}`)) {
+            delete triggeredTokens[key];
+        }
+    });
+
+    sendChat("NPC Monitor", `/w ${who} Successfully removed ${npc.name} from monitoring.`);
+}
+
 /* !proximitynpc --edit NPC_Name prop value */
 function handleEditMonitoredNPC(msg) {
     let who = msg.who || "gm";
     let args = msg.content.trim().split(" "); 
     
-    let npcName = args[2].replace("_", " ").trim();
+    // Parsing argument safely
+    let npcName = fromSafeName(args[2]);
+
     if (args.length < 4) {
         let tokenId = msg.selected[0]._id;
         let token = getObj('graphic', tokenId);
@@ -383,14 +666,17 @@ function handleEditMonitoredNPC(msg) {
                 promptMessage = "Paste the new image URL:";
                 break;
             case 'cardstyle':
-                promptMessage = "Enter a card style name ^use !proximitynpc --cardstyles to list^:";
+                promptMessage = "Enter a card style name:";
+                handleListCardStyles(msg);
                 break;
             default:
                 sendChat("NPC Monitor", `/w ${who} Unknown property: ${property}`);
                 return;
         }
 
-        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set ${property} for ${npcName}}} {{${promptMessage}=[Click Here](!proximitynpc -M ${npcName.replace(" ", "_")} ${property} ?{${promptMessage}})}}`);
+        // When generating edit dialog
+        let safeName = toSafeName(npcName);
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set ${property} for ${npcName}}} {{${promptMessage}=[Click Here](!proximitynpc -M ${safeName} ${property} ?{${promptMessage}})}}`);
         return;
     }
 
@@ -460,7 +746,11 @@ function handleListMonitoredNPCs(msg) {
         return;
     }
 
-    let list = monitoredNPCs.map(npc => `{{[${npc.name}](!proximitynpc -M ${npc.name.replace(" ", "_").trim()})=(Distance: ${npc.triggerDistance}, Timeout: ${npc.timeout} ms, Messages: ${npc.messages.length}, CardStyle: ${npc.cardStyle})}}`).join(' ');
+    let list = monitoredNPCs.map(npc => {
+        let safeName = toSafeName(npc.name);
+        return `{{[${npc.name}](!proximitynpc -M ${safeName})=(Distance: ${npc.triggerDistance}, Timeout: ${npc.timeout} ms, Messages: ${npc.messages.length}, CardStyle: ${npc.cardStyle})}}`;
+    }).join(' ');
+
 
     sendChat("NPC Monitor", "/w " + who + "&{template:default} {{name=NPC Proximity Monitor List}} "  + list);
     return;
@@ -491,10 +781,6 @@ function handleTriggerNPC(msg) {
     return;
 }
 
-function handleListCardStyles(msg) {
-    
-}
-
 /**
  * Handles NPC token selection and configuration via chat command !proximitynpc (--monitor | -m).
  * @param {Object} msg - The chat message object containing selection data
@@ -502,57 +788,43 @@ function handleListCardStyles(msg) {
 function handleMonitorNPC(msg) {
     let who = msg.who;
 
-    // If there is no token selected, show help message
-    if (msg.content.trim().split(" ").length < 3) {
-        sendChat("NPC Monitor", "/w " + who + " Please select a token to monitor.");
-        showHelpMessage();
-        return;
-    }
+    // If a token is selected, use it
+    if (msg.selected && msg.selected.length > 0) {
+        let tokenId = msg.selected[0]._id;
+        let token = getObj('graphic', tokenId);
+        if (!token) {
+            sendChat("NPC Monitor", "/w " + who + " Could not find the selected token.");
+            return;
+        }
 
-    let characterName = msg.content.trim().split(" ")[2].replace("_", " ").trim();
-    const character = findObjs({type:'character',name: characterName})
-        .filter(c=>c.get('controlledby').split(/\w*,\w*/).includes(msg.playerid))[0];
-    
-    let token = findObjs({type: 'graphic', represents: character.id})[0];
+        // If not monitored yet, create and show dialog
+        if (!state.ProximityNPC.monitoredNPCs[tokenId]) {
+            createMonitoredNPCFromToken(msg, token);
+            return;
+        }
 
-    if (!token) {
-        sendChat("NPC Monitor", "/w " + who + " Could not find selected token.");
-        return;
-    }
-
-    let tokenName = token.get('name');
-    let tokenId = token.id;
-
-    // If token is not already monitored, create a new monitored NPC entry and show dialog to configure
-    if (!state.ProximityNPC.monitoredNPCs[tokenId]) {
-        createMonitoredNPCFromToken(msg, token);
+        // Already monitored: update and show edit dialog
         showEditMonitorNPCDialog(msg, token);
         return;
     }
 
-    // If token is already monitored, update its position and show dialog to edit
-    let monitoredNPC = state.ProximityNPC.monitoredNPCs[tokenId];
+    // If no token is selected, show menu of available tokens
+    let tokens = findObjs({ type: 'graphic', subtype: 'token', layer: 'objects' });
+    if (tokens.length === 0) {
+        sendChat("NPC Monitor", "/w " + who + " No tokens found on the page to monitor.");
+        return;
+    }
 
-    // Calculate trigger distance in pixels (body widths * token diameter)
-    let tokenWidth = token.get('width');
-    let triggerDistancePixels = tokenWidth * (monitoredNPC.distance + tokenWidth / 50);
+    // Show menu of tokens to select for monitoring
+    // When showing menu of tokens
+    let menu = tokens.map(t => {
+        let safeName = toSafeName(t.get('name'));
+        return `{{[${t.get('name')}](!proximitynpc -M ${safeName})}}`;
+    }).join(' ');
 
-    // Store NPC monitoring data
-    state.ProximityNPC.monitoredNPCs[tokenId] = new MonitoredNPC(
-        tokenName,
-        triggerDistancePixels,
-        token.get('pageid'),
-        token.get('left') + (tokenWidth / 2),
-        token.get('top') + (token.get('height') / 2),
-        { x: token.get('left'), y: token.get('top') },
-        monitoredNPC.timeout,
-        monitoredNPC.img,
-        monitoredNPC.messages,
-        monitoredNPC.cardStyle || 'Default'
-    );
-
-    showEditMonitorNPCDialog(msg, token);
+    sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Select a Token to Monitor}} ${menu}`);
 }
+
 
 /**
  * Calculates the distance between two points using Pythagorean theorem.
