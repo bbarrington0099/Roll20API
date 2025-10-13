@@ -6,18 +6,21 @@
 class CardStyle {
     /**
      * Creates a new CardStyle.
+     * Colors in hex (e.g. '#8b4513') or plaintext (e.g. 'red')
      * @param {string} name - The name of the card style
-     * @param {string} borderColor - Border color in hex (e.g. '#8b4513')
-     * @param {string} backgroundColor - Background color in hex
-     * @param {string} bubbleColor - Speech bubble color in hex
-     * @param {string} textColor - Text color in hex
+     * @param {string} borderColor - Border color
+     * @param {string} backgroundColor - Background color
+     * @param {string} bubbleColor - Speech bubble color
+     * @param {string} textColor - Text color
+     * @param {string} whisper - Whisper to 'character', 'gm', 'off'
      */
-    constructor(name, borderColor = '#8b4513', backgroundColor = '#f4e8d8', bubbleColor = '#ffffff', textColor = '#2c1810') {
+    constructor(name, borderColor = '#8b4513', backgroundColor = '#f4e8d8', bubbleColor = '#ffffff', textColor = '#2c1810', whisper = 'off') {
         this.name = name;
         this.borderColor = borderColor;
         this.backgroundColor = backgroundColor;
         this.bubbleColor = bubbleColor;
         this.textColor = textColor;
+        this.whisper = whisper;
     }
 }
 
@@ -498,7 +501,6 @@ function handleEditMessages(msg) {
     }
 
     // Handle adding a new message
-    // Handle adding a new message
     if (action === 'add') {
         let promptMessage = "Enter the new message text. Use {playerName} as a placeholder:";
         sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Add Message to ${monitoredNPC.name}}} {{${promptMessage}=[Click Here](!proximitynpc -M ${safeNPCName} messages add_content ?{Message Text})}}`);
@@ -702,7 +704,7 @@ function handleEditCardStyle(msg) {
         
         sendChat("NPC Monitor", `/w ${who} Created new card style: "${styleName}".`);
         handleEditCardStyle({
-            content: `!proximitynpc -C ${toSafeName(style.name)}`,
+            content: `!proximitynpc -C ${toSafeName(styleName)}`,
             who: who
         })
         return;
@@ -797,7 +799,8 @@ function handleEditCardStyle(msg) {
             { name: 'Border Color', type: 'color', attr: 'borderColor', value: cardStyle.borderColor },
             { name: 'Background Color', type: 'color', attr: 'backgroundColor', value: cardStyle.backgroundColor },
             { name: 'Bubble Color', type: 'color', attr: 'bubbleColor', value: cardStyle.bubbleColor },
-            { name: 'Text Color', type: 'color', attr: 'textColor', value: cardStyle.textColor }
+            { name: 'Text Color', type: 'color', attr: 'textColor', value: cardStyle.textColor },
+            { name: 'Whisper', type: 'whisper', attr: 'whisper', value: cardStyle.whisper }
         ];
         
         let propertyLinks = properties.map(prop => 
@@ -834,8 +837,11 @@ function handleEditCardStyle(msg) {
             case 'textcolor':
                 promptMessage = "Enter text color ^any CSS color^:";
                 break;
+            case 'whisper':
+                promptMessage = "Enter whisper mode ^'character', 'gm', or 'off'^:";
+                break;
             default:
-                sendChat("NPC Monitor", `/w ${who} Unknown property: ${property}. Valid properties: borderColor, backgroundColor, bubbleColor, textColor`);
+                sendChat("NPC Monitor", `/w ${who} Unknown property: ${property}. Valid properties: borderColor, backgroundColor, bubbleColor, textColor, whisper`);
                 return;
         }
         
@@ -843,11 +849,9 @@ function handleEditCardStyle(msg) {
         return;
     }
     
-    let value = args.slice(4).join(" ").trim();
+    let value = args.slice(4).join(" ").trim().toLowerCase();
     
-    // No validation - accept any string as CSS will handle validation at runtime
-    // This allows color names, hex, rgb(), hsl(), etc.
-    
+    // Handle property-specific validation and setting
     switch(property) {
         case 'bordercolor':
             cardStyle.borderColor = value;
@@ -865,8 +869,19 @@ function handleEditCardStyle(msg) {
             cardStyle.textColor = value;
             sendChat("NPC Monitor", `/w ${who} Updated ${cardStyle.name} text color to "${value}"`);
             break;
+        case 'whisper':
+            // Sanitize bad args - only allow 'character', 'gm', or 'off'
+            if (value === 'character' || value === 'gm' || value === 'off') {
+                cardStyle.whisper = value;
+                sendChat("NPC Monitor", `/w ${who} Updated ${cardStyle.name} whisper to "${value}"`);
+            } else {
+                // Default to 'off' for invalid values
+                cardStyle.whisper = 'off';
+                sendChat("NPC Monitor", `/w ${who} Invalid whisper value "${value}". Set to "off". Valid values: 'character', 'gm', 'off'`);
+            }
+            break;
         default:
-            sendChat("NPC Monitor", `/w ${who} Unknown property: ${property}. Valid properties: borderColor, backgroundColor, bubbleColor, textColor`);
+            sendChat("NPC Monitor", `/w ${who} Unknown property: ${property}. Valid properties: borderColor, backgroundColor, bubbleColor, textColor, whisper`);
             return;
     }
     
@@ -1232,7 +1247,7 @@ function triggerNPCMessage(npc, playerName="Guild Member") {
         `</div>`;
 
     // Send as whisper to the player who triggered it
-    sendChat(npc.name, card);
+    sendChat(npc.name, `${(cardStyle.whisper == 'off') ? '' : (cardStyle.whisper == 'character') ? `/w ${playerName} ` : '/w gm '}${card}`);
 }
 
 /**
