@@ -622,7 +622,7 @@ function handleEditMessages(msg) {
         let newMessage = new MessageObject(newContent, 1, null); // Default weight: 1
         monitoredNPC.messages.push(newMessage);
 
-        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set Message Weight}} {{Message added! Now set its relative weight (higher number = more likely to appear):}} {{Weight (default 1)=[Click Here](!proximitynpc -M ${safeNPCName} messages add_weight ${monitoredNPC.messages.length - 1} ?{Weight|1})}}`);
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set Message Weight}} {{Message added! Now set its relative weight ^higher number more likely to appear^:}} {{Weight ^default 1, off 0^=[Click Here](!proximitynpc -M ${safeNPCName} messages add_weight ${monitoredNPC.messages.length - 1} ?{Weight|1})}}`);
         return;
     }
 
@@ -661,8 +661,8 @@ function handleEditMessages(msg) {
             sendChat("NPC Monitor", `/w ${who} Invalid message index.`);
             return;
         }
-        if (isNaN(weight) || weight <= 0) {
-            sendChat("NPC Monitor", `/w ${who} Weight must be a positive number. Using default of 1.`);
+        if (isNaN(weight) || weight < 0) {
+            sendChat("NPC Monitor", `/w ${who} Weight must be >= 0. Using default of 1.`);
             weight = 1;
         }
 
@@ -746,7 +746,7 @@ function handleEditMessages(msg) {
     if (action === 'edit_weight_save') {
         let msgIndex = parseInt(args[5]);
         let newWeight = parseInt(args[6]);
-        if (isNaN(newWeight) || newWeight <= 0) newWeight = 1;
+        if (isNaN(newWeight) || newWeight < 0) newWeight = 1;
         monitoredNPC.messages[msgIndex].weight = newWeight;
         sendChat("NPC Monitor", `/w ${who} ${npcName} Message ${msgIndex + 1} weight updated to ${newWeight}.`);
         handleEditMessages({ content: `!proximitynpc -M ${safeNPCName} messages`, who: who });
@@ -1302,19 +1302,32 @@ function getPlayerNameFromToken(token) {
 
 /**
  * Chooses a random message from an array, weighted by `messageObject.weight`.
+ * Messages with weight 0 are completely excluded from selection.
  * @param {MessageObject[]} messages - Array of message objects.
  * @returns {MessageObject} The selected message.
  */
 function getRandomMessage(messages) {
-    if (!messages || messages.length===0) {
+    if (!messages || messages.length === 0) {
         return new MessageObject("They are lost in thought...", 1);
     }
-    let pool = [];
-    messages.forEach(m => {
-        let w = m.weight || 1;
-        for (let i=0; i<w; i++) pool.push(m);
+    
+    // Filter out messages with weight 0 or negative weight
+    const validMessages = messages.filter(m => {
+        let weight = (m.weight !== undefined && m.weight !== null) ? m.weight : 1;
+        return weight > 0;
     });
-    return pool[Math.floor(Math.random()*pool.length)];
+    
+    if (validMessages.length === 0) {
+        return new MessageObject("They are lost in thought...", 1);
+    }
+    
+    let pool = [];
+    validMessages.forEach(m => {
+        let w = (m.weight !== undefined && m.weight !== null) ? m.weight : 1;
+        for (let i = 0; i < w; i++) pool.push(m);
+    });
+    
+    return pool[Math.floor(Math.random() * pool.length)];
 }
 
 /**
