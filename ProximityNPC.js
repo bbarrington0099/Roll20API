@@ -78,13 +78,14 @@ class MonitoredNPC {
      * @param {string} pageId - Roll20 page ID where NPC is located
      * @param {number} centerX - X coordinate of NPC center
      * @param {number} centerY - Y coordinate of NPC center
-     * @param {Object} lastPosition - Last known position {x, y}
+     * @param {{x, y{number}}} lastPosition - Last known position {x, y}
      * @param {number} timeout - Cooldown time in milliseconds before re-triggering (default: 10000, 0 = permanent)
      * @param {string} img - URL to NPC's image
      * @param {MessageObject[]} messages - Array of possible messages
      * @param {string} cardStyle - Card style name for this NPC
+     * @param {string} mode - 'on', 'off', 'once' The mode
      */
-    constructor(name, triggerDistance = 2, pageId = '', centerX = 0, centerY = 0, lastPosition = { x: 0, y: 0 }, timeout = 10000, img = 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/GuildEmblem.png', messages = [], cardStyle = 'Default') {
+    constructor(name, triggerDistance = 2, pageId = '', centerX = 0, centerY = 0, lastPosition = { x: 0, y: 0 }, timeout = 10000, img = 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/GuildEmblem.png', messages = [], cardStyle = 'Default', mode="on") {
         this.name = name;
         this.triggerDistance = triggerDistance; // body widths
         this.pageId = pageId;
@@ -95,6 +96,7 @@ class MonitoredNPC {
         this.img = img;
         this.messages = messages;
         this.cardStyle = cardStyle;
+        this.mode = mode;
     }
 }
 
@@ -516,7 +518,8 @@ function showEditMonitorNPCDialog(msg, token) {
     let safeName = toSafeName(npc.name);
     // Build clickable fields for each property
     let properties = [
-        { label: 'Trigger Distance (in token widths)', attr: 'triggerDistance'},
+        {label: 'Mode', attr: 'mode'},
+        { label: 'Trigger Distance ^in token widths^', attr: 'triggerDistance'},
         { label: 'Timeout (ms)', attr: 'timeout'},
         { label: 'Image URL', attr: 'img'},
         { label: 'Card Style', attr: 'cardStyle'},
@@ -1090,6 +1093,11 @@ function handleEditMonitoredNPC(msg) {
         return;
     }
 
+    if (property === 'mode' && args.length < 5) {
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set Mode for ${npc.name}}} {{Current: ${npc.mode || 'on'}}} {{New Mode=[Click Here](!proximitynpc -e ${toSafeName(npc.name)} mode ?{Enter new Mode ^on, off, once^|${npc.mode || 'on'}})}}`);
+        return;
+    }
+
 
     let value = args.slice(4).join(" ").trim();
     switch(property) {
@@ -1126,6 +1134,16 @@ function handleEditMonitoredNPC(msg) {
                 sendChat("NPC Monitor", `/w ${who} ${npc.name} style set to ${style.name}.`);
             }
             break;
+        case 'mode':
+            let mode = value.toLowerCase();
+            if (mode != 'on' && mode != 'off' && mode != 'once') {
+                sendChat("NPC Monitor", `/w ${who} Mode ${value} not supported, defaulting to 'on'.`);
+                npc.mode = 'on';
+            } else {
+                npc.mode = mode;
+                sendChat("NPC Monitor", `/w ${who} ${npc.name} mode set to ${npc.mode}.`);
+            }
+            break;
         default:
             sendChat("NPC Monitor", `/w ${who} Unknown property "${property}".`);
     }
@@ -1156,7 +1174,7 @@ function handleListMonitoredNPCs(msg) {
     }
     let list = monitored.map(npc => {
         let safeName = toSafeName(npc.name);
-        return `{{[${npc.name}](!proximitynpc -M ${safeName})=(Dist: ${npc.triggerDistance}, Timeout: ${npc.timeout}ms, Messages: ${npc.messages.length}, Style: ${npc.cardStyle})}}`;
+        return `{{[${npc.name}](!proximitynpc -M ${safeName})=(Mode: ${npc.mode}, Dist: ${npc.triggerDistance}, Timeout: ${npc.timeout}ms, Messages: ${npc.messages.length}, Style: ${npc.cardStyle})}}`;
     }).join(" ");
     sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Monitored NPCs}} ${list}`);
 }
@@ -1172,7 +1190,7 @@ function handleTriggerNPC(msg) {
     const args = msg.content.trim().split(/\s+/);
     const token = getTokenFromCall(msg);
 
-    // 1️⃣ If a token is selected → trigger its monitored NPC
+    // If a token is selected → trigger its monitored NPC
     if (token) {
         const monitoredNPC = state.ProximityNPC.monitoredNPCs[token.id];
         if (!monitoredNPC) {
@@ -1183,7 +1201,7 @@ function handleTriggerNPC(msg) {
         return;
     }
 
-    // 2️⃣ No token selected → try by name argument
+    // No token selected → try by name argument
     if (args.length > 2) {
         const npcName = fromSafeName(args.slice(2).join(" "));
         const entry = Object.entries(state.ProximityNPC.monitoredNPCs)
@@ -1195,7 +1213,7 @@ function handleTriggerNPC(msg) {
         }
     }
 
-    // 3️⃣ No token and no matching name → list all monitored NPCs to choose from
+    // No token and no matching name → list all monitored NPCs to choose from
     const npcEntries = Object.entries(state.ProximityNPC.monitoredNPCs);
     if (npcEntries.length === 0) {
         sendChat("NPC Monitor", `/w ${who} No monitored NPCs are currently active.`);
@@ -1332,11 +1350,14 @@ function getRandomMessage(messages) {
 
 /**
  * Triggers and displays an NPC message when proximity condition is met.
- * @param {MonitoredNPC} npc - The NPC that triggered the message
+ * @param {MonitoredNPC} npc - The NPC that was triggered
  * @param {string} playerName - The name of the player who triggered the NPC
  */
 function triggerNPCMessage(npc, playerName="Guild Member") {
-    if (!npc) return;
+    if (!npc || npc.mode == "off") return;
+    if (npc.mode == "once") {
+        npc.mode = "off";
+    }
 
     let selectedMessage = getRandomMessage(npc.messages);
 
@@ -1398,13 +1419,18 @@ function autoMonitorNPCs() {
                 token.get('top') + (token.get('height') / 2),
                 { x: token.get('left'), y: token.get('top') },
                 presetNPC.timeout,
-                getBestTokenImage(token), // Use fallback system instead of preset image
+                getBestTokenImage(token),
                 presetNPC.messages,
                 presetNPC.cardStyle || 'Default',
             );
         }
     });
 }
+
+/* TODO:
+    - on ready get all tokens and if they are monitored then remonitor them (allow for duplicate tokens)
+    - on token drop, if it represents a monitored npc then remonitor it
+*/
 
 // Initialize the script when ready
 on('ready', function () {
