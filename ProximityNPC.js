@@ -81,7 +81,7 @@ class MonitoredNPC {
      * @param {MessageObject[]} messages - Array of possible messages
      * @param {string} cardStyle - Card style name for this NPC
      */
-    constructor(name, triggerDistance = 2, pageId = '', centerX = 0, centerY = 0, lastPosition = { x: 0, y: 0 }, timeout = 10000, img = '', messages = [], cardStyle = 'Default') {
+    constructor(name, triggerDistance = 2, pageId = '', centerX = 0, centerY = 0, lastPosition = { x: 0, y: 0 }, timeout = 10000, img = 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/GuildEmblem.png', messages = [], cardStyle = 'Default') {
         this.name = name;
         this.triggerDistance = triggerDistance; // body widths
         this.pageId = pageId;
@@ -234,15 +234,6 @@ state.ProximityNPC = {
 let triggeredTokens = {};
 
 /**
- * Finds a preset NPC by name.
- * @param {string} name - The NPC name to search for
- * @returns {PresetNPC|undefined} The found NPC or undefined
- */
-function getPresetNPCByName(name) {
-    return state.ProximityNPC.presetNPCs.find(npc => npc.name === name);
-}
-
-/**
  * Main function to set up NPC monitoring and event handlers.
  * Initializes chat message listeners and token movement tracking.
  */
@@ -255,6 +246,10 @@ function setupNPCProximity() {
             if (msg.content.includes("--monitor") || msg.content.includes("-M")) {
                 let args = msg.content.trim().split(" ");
 
+                if (args.length > 3 && args[3] === 'messages') {
+                    handleEditMessages(msg);
+                    return;
+                }
                 // If more than 3 args, treat as edit call
                 if (args.length > 3) {
                     handleEditMonitoredNPC(msg);
@@ -266,7 +261,6 @@ function setupNPCProximity() {
 
             if (msg.content.includes("--edit") || msg.content.includes("-e")) {
                 handleEditMonitoredNPC(msg);
-                handleListMonitoredNPCs(msg);
                 return;
             }
 
@@ -285,7 +279,7 @@ function setupNPCProximity() {
                 return;
             }
 
-            if (msg.content.includes("--cardstyles") || msg.content.includes("-c")) {
+            if (msg.content.includes("--cardstyles") || msg.content.includes("-cl")) {
                 handleListCardStyles(msg);
                 return;
             }
@@ -320,64 +314,332 @@ function setupNPCProximity() {
     });
 }
 
+/**
+ * Creates a MonitoredNPC entry for the given token and opens its edit dialog.
+ * @param {Object} msg - The chat message for whispering back.
+ * @param {Graphic} token - The token to monitor.
+ */
 function createMonitoredNPCFromToken(msg, token) {
-    if (!state.ProximityNPC.monitoredNPCs[token.id]) {
-        state.ProximityNPC.monitoredNPCs[token.id] = 
-            new MonitoredNPC(
-                token.get('name'),
-                state.ProximityNPC.defaultDistance || 2,
-                token.get('pageid'),
-                token.get('left') + (token.get('width') / 2),
-                token.get('top') + (token.get('height') / 2),
-                { x: token.get('left'), y: token.get('top') },
-                state.ProximityNPC.defaultTimeout || 10000,
-                state.ProximityNPC.defaultImagePath || '',
-                [],
-                state.ProximityNPC.cardStyles[0].name || 'Default'
-            );
-    }
+    let name = token.get('name');
+    state.ProximityNPC.monitoredNPCs[token.id] = new MonitoredNPC(
+        name,
+        state.ProximityNPC.defaultDistance || 2, // in token widths
+        token.get('pageid'),
+        token.get('left') + token.get('width')/2,
+        token.get('top') + token.get('height')/2,
+        { x: token.get('left'), y: token.get('top') },
+        state.ProximityNPC.defaultTimeout || 10000,
+        state.ProximityNPC.defaultImagePath || 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/GuildEmblem.png',
+        [],
+        state.ProximityNPC.cardStyles[0].name || 'Default'
+    );
     showEditMonitorNPCDialog(msg, token);
 }
 
+/**
+ * Replaces spaces in a string with underscores for safe command usage.
+ * @param {string} name - The original name.
+ * @returns {string} The safe name (spaces → underscores).
+ */
 function toSafeName(name) {
     return name.trim().replace(/\s+/g, "_");
 }
 
+/** 
+ * Reverses toSafeName: replaces underscores with spaces.
+ * @param {string} safeName - The underscored name.
+ * @returns {string} The original name with spaces.
+ */
 function fromSafeName(safeName) {
     return safeName.replace(/_/g, " ").trim();
 }
 
+/**
+ * Displays the edit dialog for a monitored NPC, with options for each property.
+ * @param {Object} msg - The chat message (including GM whisper).
+ * @param {Graphic} token - The token object for the NPC.
+ */
 function showEditMonitorNPCDialog(msg, token) {
+    if (!token) {
+        sendChat("NPC Monitor", `/w ${msg.who} Please select a valid token to edit.`);
+        return;
+    }
+    let npc = state.ProximityNPC.monitoredNPCs[token.id];
+    if (!npc) {
+        sendChat("NPC Monitor", `/w ${msg.who} Token "${token.get('name')}" is not monitored.`);
+        return;
+    }
+    let safeName = toSafeName(npc.name);
+    // Build clickable fields for each property
     let properties = [
-        { name: 'Trigger Distance (body widths)', type: 'number', attr: 'triggerDistance'},
-        { name: 'Timeout (ms, 0 permanent)', type: 'number', attr: 'timeout'},
-        { name: 'Image URL', type: 'text', attr: 'img'},
-        { name: 'Card Style', type: 'select', attr: 'cardStyle', options: state.ProximityNPC.cardStyles.map(style => style.name)},
-        { name: 'Messages', type: 'messages', attr: 'messages'}
+        { label: 'Trigger Distance (in token widths)', attr: 'triggerDistance'},
+        { label: 'Timeout (ms)', attr: 'timeout'},
+        { label: 'Image URL', attr: 'img'},
+        { label: 'Card Style', attr: 'cardStyle'},
+        { label: 'Messages', attr: 'messages'}
     ];
+    let buttons = properties.map(prop => {
+        return `{{[${prop.label}](!proximitynpc -M ${safeName} ${prop.attr})}}`;
+    }).join(" ");
+    sendChat("NPC Monitor", `/w ${msg.who} &{template:default} {{name=Edit NPC: ${npc.name}}} ${buttons} {{[Delete Monitor](!proximitynpc -D ${safeName})}}`);
+}
 
-    let monitoredNPC = state.ProximityNPC.monitoredNPCs[token.id];
+/**
+ * Shows the help/usage information via chat.
+ * @param {Object} msg - The chat message (for determining recipient).
+ */
+function showHelpMessage(msg = {who: "gm"}) {
+    let who = msg.who || "gm";
+    sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=NPC Proximity Monitor Help}} {{!proximitynpc=Main call (must include one flag)}} {{--monitor|-M [Token/Name]=Add or edit an NPC monitor (requires a token or name). Use underscores for spaces.}} {{--list|-l=List all monitored NPCs}} {{--menu|-m=Open the ProximityNPC menu}} {{--edit|-e [Name] [prop] [value]=Edit a monitored NPC's property (prop: triggerDistance, timeout, img, cardStyle)}} {{--trigger|-t [Token/Name]=Manually trigger an NPC message}} {{--cardstyles|-cl=List all card styles}} {{--cardstyle|-C [StyleName] [property] [value]=Edit or create a card style}} {{--delete|-D [Name]=Delete a monitored NPC}} {{--help|-h=Show this help}}`);
+}
+
+/**
+ * Finds a token on the GM’s current page by a character’s name.
+ * @param {string} charName - The character name to find.
+ * @returns {Graphic|null} The first matching token, or null if none found.
+ */
+function findTokenByCharacterName(charName) {
+    let character = findObjs({ _type: 'character', name: charName })[0];
+    if (!character) return null;
+    let pageId = Campaign().get("playerpageid");
+    let tokens = findObjs({ _pageid: pageId, _type: "graphic", represents: character.id });
+    return tokens.find(t => t.get("layer")==="objects") || tokens[0] || null;
+}
+
+/**
+ * Extracts the token to act on from a chat command or selection.
+ * Chat args take priority over a selected token.
+ * @param {Object} msg - The chat message object (`msg.type === "api"`).
+ * @returns {Graphic|undefined} The token to use.
+ */
+function getTokenFromCall(msg) {
+    let args = msg.content.trim().split(" ");
+    // If command includes a name after flag, use that.
+    if (args.length > 2) {
+        return findTokenByCharacterName(fromSafeName(args[2]));
+    } 
+    // Otherwise, if a token is selected, use that.
+    if (msg.selected && msg.selected.length > 0) {
+        return getObj('graphic', msg.selected[0]._id);
+    }
+    return;
+}
+
+/**
+ * Handles adding, editing, listing, and deleting messages for a monitored NPC.
+ * @param {Object} msg - The chat message object
+ */
+function handleEditMessages(msg) {
+    let who = msg.who || "gm";
+    let args = msg.content.trim().split(" ");
+    
+    // Extract the NPC name from the command (e.g., "Keoti_Fang")
+    let npcName = fromSafeName(args[2]);
+    let action = args[4] ? args[4].toLowerCase() : 'menu'; // Actions: 'menu', 'add', 'edit', 'delete'
+
+    // Find the monitored NPC
+    let monitoredNPC = Object.values(state.ProximityNPC.monitoredNPCs).find(npc => npc.name.trim() === npcName);
     if (!monitoredNPC) {
-        sendChat("NPC Monitor", "/w gm Could not find monitored NPC for " + token.get('name'));
+        sendChat("NPC Monitor", `/w ${who} Could not find monitored NPC: ${npcName}`);
         return;
     }
 
     let safeNPCName = toSafeName(monitoredNPC.name);
-    sendChat("NPC Monitor", `/w gm &{template:default} {{name=Edit Monitored NPC: ${monitoredNPC.name}}} ${properties.map((prop) => {
-        return `{{[${prop.name}](!proximitynpc -M ${safeNPCName} ${prop.attr})}}`
-    }).join(" ")} {{[Delete](!proximitynpc -D ${safeNPCName})}}`);
+
+    // Show the main Messages management menu
+    if (action === 'menu' || !action) {
+        let messageList = "{{No messages configured}}";
+        if (monitoredNPC.messages.length > 0) {
+            messageList = monitoredNPC.messages.map((msgObj, index) => {
+                let preview = msgObj.content.length > 50 ? msgObj.content.substring(0, 50) + "..." : msgObj.content;
+                return `{{[${index + 1}: ${preview}](!proximitynpc -M ${safeNPCName} messages edit ${index})}}`;
+            }).join(' ');
+        }
+
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Message Manager: ${monitoredNPC.name}}} {{Total Messages: ${monitoredNPC.messages.length}}} ${messageList} {{[Add New Message](!proximitynpc -M ${safeNPCName} messages add)}} {{[Back to NPC Edit](!proximitynpc -M ${safeNPCName})}}`);
+        return;
+    }
+
+    // Handle adding a new message
+    // Handle adding a new message
+    if (action === 'add') {
+        let promptMessage = "Enter the new message text. Use {playerName} as a placeholder:";
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Add Message to ${monitoredNPC.name}}} {{${promptMessage}=[Click Here](!proximitynpc -M ${safeNPCName} messages add_content ?{Message Text})}}`);
+        return;
+    }
+
+    // Handle setting the content for a new message
+    if (action === 'add_content') {
+        let newContent = args.slice(5).join(" ").trim();
+        if (!newContent) {
+            sendChat("NPC Monitor", `/w ${who} Message content cannot be empty. Make sure to include {playerName} if needed.`);
+            return;
+        }
+
+        let newMessage = new MessageObject(newContent, 1, null); // Default weight: 1
+        monitoredNPC.messages.push(newMessage);
+
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set Message Weight}} {{Message added! Now set its relative weight (higher number = more likely to appear):}} {{Weight (default 1)=[Click Here](!proximitynpc -M ${safeNPCName} messages add_weight ${monitoredNPC.messages.length - 1} ?{Weight|1})}}`);
+        return;
+    }
+
+    // Handle editing message content
+    if (action === 'edit_content') {
+        let msgIndex = parseInt(args[5]);
+        let monitoredMessage = monitoredNPC.messages[msgIndex];
+        if (!monitoredMessage) {
+            sendChat("NPC Monitor", `/w ${who} Invalid message index.`);
+            return;
+        }
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Edit Message Content}} {{Current: ${monitoredMessage.content}}} {{Enter new text. Use {playerName} as a placeholder: [Click Here](!proximitynpc -M ${safeNPCName} messages edit_content_save ${msgIndex} ?{Message Text})}}`);
+        return;
+    }
+
+    // Save edited message content
+    if (action === 'edit_content_save') {
+        let msgIndex = parseInt(args[5]);
+        let newContent = args.slice(6).join(" ").trim();
+        if (!newContent) {
+            sendChat("NPC Monitor", `/w ${who} Message content cannot be empty. Remember {playerName} placeholder.`);
+            return;
+        }
+        monitoredNPC.messages[msgIndex].content = newContent;
+        sendChat("NPC Monitor", `/w ${who} Message content updated.`);
+        handleEditMessages({ content: `!proximitynpc -M ${safeNPCName} messages`, who: who });
+        return;
+    }
+
+    // Handle setting the weight for the newly added message
+    if (action === 'add_weight') {
+        let msgIndex = parseInt(args[5]);
+        let weight = parseInt(args[6]);
+
+        if (isNaN(msgIndex) || msgIndex < 0 || msgIndex >= monitoredNPC.messages.length) {
+            sendChat("NPC Monitor", `/w ${who} Invalid message index.`);
+            return;
+        }
+        if (isNaN(weight) || weight <= 0) {
+            sendChat("NPC Monitor", `/w ${who} Weight must be a positive number. Using default of 1.`);
+            weight = 1;
+        }
+
+        monitoredNPC.messages[msgIndex].weight = weight;
+        sendChat("NPC Monitor", `/w ${who} Message weight set to ${weight}.`);
+        // Return to the messages menu
+        handleEditMessages({ content: `!proximitynpc -M ${safeNPCName} messages`, who: who });
+        return;
+    }
+
+    // In the handleEditMessages function, inside the 'edit' action block:
+    if (action === 'edit') {
+        let msgIndex = parseInt(args[5]);
+        // Adjust for zero-based index immediately
+        let actualIndex = msgIndex;
+        
+        // Validate the adjusted index
+        if (isNaN(actualIndex) || actualIndex < 0 || actualIndex >= monitoredNPC.messages.length) {
+            sendChat("NPC Monitor", `/w ${who} Invalid message selection.`);
+            return;
+        }
+        
+        let messageToEdit = monitoredNPC.messages[actualIndex];
+        // Show edit options for the specific message. Note: Display shows actualIndex + 1 for user clarity.
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Edit Message ${actualIndex + 1}}} {{Card Style: ${messageToEdit.cardStyle || 'Default'}}} {{Content: ${messageToEdit.content}}} {{Weight: ${messageToEdit.weight}}} {{[Edit Content](!proximitynpc -M ${safeNPCName} messages edit_content ${actualIndex})}} {{[Edit Weight](!proximitynpc -M ${safeNPCName} messages edit_weight ${actualIndex})}} {{[Change Card Style](!proximitynpc -M ${safeNPCName} messages edit_cardstyle ${actualIndex})}} {{[Delete Message](!proximitynpc -M ${safeNPCName} messages delete ${actualIndex})}} {{[Back to Messages](!proximitynpc -M ${safeNPCName} messages)}}`);
+        return;
+    }
+
+    // Handle deleting a message
+    if (action === 'delete') {
+        let msgIndex = parseInt(args[5]);
+        if (isNaN(msgIndex) || msgIndex < 0 || msgIndex >= monitoredNPC.messages.length) {
+            sendChat("NPC Monitor", `/w ${who} Invalid message index for deletion.`);
+            return;
+        }
+
+        let deletedMessage = monitoredNPC.messages.splice(msgIndex, 1)[0];
+        sendChat("NPC Monitor", `/w ${who} Deleted message: "${deletedMessage.content.substring(0, 50)}..."`);
+        // Return to the messages menu
+        handleEditMessages({ content: `!proximitynpc -M ${safeNPCName} messages`, who: who });
+        return;
+    }
+
+    if (action === 'edit_content') {
+        let msgIndex = parseInt(args[5]);
+        let monitoredMessage = monitoredNPC.messages[msgIndex];
+        if (!monitoredMessage) {
+            sendChat("NPC Monitor", `/w ${who} Invalid message index.`);
+            return;
+        }
+        let safeNPCName = toSafeName(monitoredNPC.name);
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Edit Message Content}} {{Current: ${monitoredMessage.content}}} {{New Content: [Click Here](!proximitynpc -M ${safeNPCName} messages edit_content_save ${msgIndex} ?{Message Text|${monitoredMessage.content}})}}`);
+        return;
+    }
+
+    if (action === 'edit_content_save') {
+        let msgIndex = parseInt(args[5]);
+        let newContent = args.slice(6).join(" ").trim();
+        if (!newContent) {
+            sendChat("NPC Monitor", `/w ${who} Message content cannot be empty.`);
+            return;
+        }
+        monitoredNPC.messages[msgIndex].content = newContent;
+        sendChat("NPC Monitor", `/w ${who} Message content updated.`);
+        handleEditMessages({ content: `!proximitynpc -M ${safeNPCName} messages`, who: who });
+        return;
+    }
+
+    if (action === 'edit_weight') {
+        let msgIndex = parseInt(args[5]);
+        let monitoredMessage = monitoredNPC.messages[msgIndex];
+        if (!monitoredMessage) {
+            sendChat("NPC Monitor", `/w ${who} Invalid message index.`);
+            return;
+        }
+        let safeNPCName = toSafeName(monitoredNPC.name);
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Edit Message Weight}} {{Current Weight: ${monitoredMessage.weight}}} {{New Weight: [Click Here](!proximitynpc -M ${safeNPCName} messages edit_weight_save ${msgIndex} ?{Weight|${monitoredMessage.weight}})}}`);
+        return;
+    }
+
+    if (action === 'edit_weight_save') {
+        let msgIndex = parseInt(args[5]);
+        let newWeight = parseInt(args[6]);
+        if (isNaN(newWeight) || newWeight <= 0) newWeight = 1;
+        monitoredNPC.messages[msgIndex].weight = newWeight;
+        sendChat("NPC Monitor", `/w ${who} Message weight updated to ${newWeight}.`);
+        handleEditMessages({ content: `!proximitynpc -M ${safeNPCName} messages`, who: who });
+        return;
+    }
+
+    if (action === 'edit_cardstyle') {
+        let msgIndex = parseInt(args[5]);
+        let styleList = state.ProximityNPC.cardStyles.map(style =>
+            `{{[${style.name}](!proximitynpc -M ${safeNPCName} messages set_cardstyle ${msgIndex} ${toSafeName(style.name)})}}`
+        ).join(' ');
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set Message Card Style}} ${styleList} \
+    {{[Back to Edit Message](!proximitynpc -M ${safeNPCName} messages edit ${msgIndex})}}`);
+        return;
+    }
+    if (action === 'set_cardstyle') {
+        let msgIndex = parseInt(args[5]);
+        let styleName = fromSafeName(args.slice(6).join(" "));
+        let style = state.ProximityNPC.cardStyles.find(s => s.name.toLowerCase() === styleName.toLowerCase());
+        if (!style) {
+            sendChat("NPC Monitor", `/w ${who} Card style "${styleName}" not found.`);
+            return;
+        }
+        monitoredNPC.messages[msgIndex].cardStyle = style.name;
+        sendChat("NPC Monitor", `/w ${who} Message card style set to ${style.name}.`);
+        // Return to the message edit screen
+        handleEditMessages({ content: `!proximitynpc -M ${safeNPCName} messages edit ${msgIndex}`, who: who });
+        return;
+    }
 }
 
-function showHelpMessage(msg = {who: "gm"}) {
-    let who = msg.who || "gm";
-
-    sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=NPC Proximity Monitor Help}} {{!proximitynpc=Main call required before args}} {{--monitor | -M=Requires token to be selected, ensures the token is monitored up to date and opens the editing menu}} {{--list | -l=Lists all currently monitored NPC tokens}} {{--menu | -m=Opens the main menu for managing ProximityNPC}} {{--help | -h=Displays this help message}}`);
-    return;
-}
-
-/* !proximitynpc --C Style_Name prop value */
-/* !proximitynpc --C Style_Name prop value */
-/* !proximitynpc --C Style_Name prop value */
+/**
+ * Edits a card style's properties via chat.
+ * Usage: !proximitynpc -C <StyleName> <property> <value>
+ * @param {Object} msg - The chat message.
+ */
 function handleEditCardStyle(msg) {
     let who = msg.who || "gm";
     let args = msg.content.trim().split(" ");
@@ -481,7 +743,8 @@ function handleEditCardStyle(msg) {
     let cardStyle = state.ProximityNPC.cardStyles.find(style => style.name.toLowerCase() === styleName.toLowerCase());
     
     if (!cardStyle) {
-        sendChat("NPC Monitor", `/w ${who} Could not find card style: ${styleName}. Use !proximitynpc --cardstyles to see available styles.`);
+        sendChat("NPC Monitor", `/w ${who} Could not find card style: ${styleName}.`);
+        handleListCardStyles(msg);
         return;
     }
     
@@ -574,368 +837,323 @@ function handleEditCardStyle(msg) {
     sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Card Style Updated}} {{[Continue Editing ${cardStyle.name}](!proximitynpc -C ${toSafeName(cardStyle.name)})}}`);
 }
 
-// Also update the handleListCardStyles function to be more interactive
+/**
+ * Lists or creates card styles via chat command.
+ * @param {Object} msg - The chat message object.
+ */
 function handleListCardStyles(msg) {
     let who = msg.who || "gm";
-
-    let styleList = state.ProximityNPC.cardStyles.map(style => 
-        `{{[${style.name}](!proximitynpc -C ${toSafeName(style.name)})}}`
-    ).join(' ');
-
-    sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=NPC Proximity Monitor Card Styles}} {{[Create New](!proximitynpc -C new)}} ${styleList}`);
+    let list = state.ProximityNPC.cardStyles.map(s => `{{[${s.name}](!proximitynpc -C ${toSafeName(s.name)})}}`).join(" ");
+    sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Card Styles}} {{[Create New](!proximitynpc -C new)}} ${list}`);
 }
 
-/* !proximitynpc --delete NPC_Name */
+/**
+ * Handles deleting a monitored NPC (removing it from state).
+ * @param {Object} msg - The chat message object.
+ */
 function handleDeleteMonitor(msg) {
     let who = msg.who || "gm";
     let args = msg.content.trim().split(" ");
-
-    // If no NPC name is given, show a clickable menu of monitored NPCs
+    // If no name provided, list them
     if (args.length < 3) {
-        let monitoredNPCs = Object.values(state.ProximityNPC.monitoredNPCs);
-        if (monitoredNPCs.length === 0) {
-            sendChat("NPC Monitor", `/w ${who} No NPCs are currently being monitored.`);
+        let entries = Object.values(state.ProximityNPC.monitoredNPCs);
+        if (entries.length === 0) {
+            sendChat("NPC Monitor", `/w ${who} No NPCs are monitored.`);
             return;
         }
-
-        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=NPC Proximity Monitor Delete}} ` +
-            monitoredNPCs.map(npc => {
-                let safeName = toSafeName(npc.name);
-                return `{{[${npc.name}](!proximitynpc -D ${safeName})}}`;
-            }))
+        let menu = entries.map(npc => `{{[${npc.name}](!proximitynpc -D ${toSafeName(npc.name)})}}`).join(" ");
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Delete Monitored NPC}} ${menu}`);
         return;
     }
-
-    // Otherwise, delete the specific NPC
-    // Parsing argument safely
-    let npcName = fromSafeName(args[2]);
-
-    // When generating delete menu
-    
-
-    let npcEntry = Object.entries(state.ProximityNPC.monitoredNPCs)
-        .find(([tokenId, npc]) => npc.name.trim() === npcName);
-
-    if (!npcEntry) {
-        sendChat("NPC Monitor", `/w ${who} Could not find monitored NPC with name: ${npcName}`);
+    let name = fromSafeName(args[2]);
+    let entry = Object.entries(state.ProximityNPC.monitoredNPCs).find(([id,npc]) => npc.name === name);
+    if (!entry) {
+        sendChat("NPC Monitor", `/w ${who} Monitored NPC "${name}" not found.`);
         return;
     }
-
-    let [tokenId, npc] = npcEntry;
-
-    // Remove from monitored list
+    let [tokenId, npc] = entry;
     delete state.ProximityNPC.monitoredNPCs[tokenId];
-
-    // Remove any pending triggers for this NPC
+    // Clear any pending triggers
     Object.keys(triggeredTokens).forEach(key => {
-        if (key.endsWith(`_${tokenId}`)) {
-            delete triggeredTokens[key];
-        }
+        if (key.endsWith(`_${tokenId}`)) delete triggeredTokens[key];
     });
-
-    sendChat("NPC Monitor", `/w ${who} Successfully removed ${npc.name} from monitoring.`);
+    sendChat("NPC Monitor", `/w ${who} Removed "${npc.name}" from monitoring.`);
 }
 
-/* !proximitynpc --edit NPC_Name prop value */
+/**
+ * Edits properties of a monitored NPC via chat command.
+ * Usage: !proximitynpc -e <NPC_Name> <prop> <value>
+ * @param {Object} msg - The chat message.
+ */
 function handleEditMonitoredNPC(msg) {
     let who = msg.who || "gm";
-    let args = msg.content.trim().split(" "); 
-    
-    // Parsing argument safely
+    let args = msg.content.trim().split(" ");
     let npcName = fromSafeName(args[2]);
-
+    let entry = Object.entries(state.ProximityNPC.monitoredNPCs).find(([id,npc]) => npc.name === npcName);
+    if (!entry) {
+        sendChat("NPC Monitor", `/w ${who} Monitored NPC "${npcName}" not found.`);
+        return;
+    }
+    let [tokenId, npc] = entry;
+    // If no prop given, open edit dialog
     if (args.length < 4) {
-        let tokenId = msg.selected[0]._id;
         let token = getObj('graphic', tokenId);
-        showEditMonitorNPCDialog(msg, token);
+        showEditMonitorNPCDialog({who: who}, token);
         return;
     }
 
     let property = args[3].toLowerCase();
-    if (args.length < 5) {
-        let promptMessage = "";
 
-        switch(property) {
-            case 'triggerdistance':
-                promptMessage = "Enter a new trigger distance ^in body widths^:";
-                break;
-            case 'timeout':
-                promptMessage = "Enter a new timeout value ^ms, 0 permanent^:";
-                break;
-            case 'img':
-                promptMessage = "Paste the new image URL:";
-                break;
-            case 'cardstyle':
-                promptMessage = "Enter a card style name:";
-                handleListCardStyles(msg);
-                break;
-            default:
-                sendChat("NPC Monitor", `/w ${who} Unknown property: ${property}`);
-                return;
-        }
-
-        // When generating edit dialog
-        let safeName = toSafeName(npcName);
-        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set ${property} for ${npcName}}} {{${promptMessage}=[Click Here](!proximitynpc -M ${safeName} ${property} ?{${promptMessage}})}}`);
+    if (property === 'cardstyle' && args.length < 5) {
+        // List all styles for user to pick
+        let styleList = state.ProximityNPC.cardStyles.map(s =>
+            `{{[${s.name}](!proximitynpc -e ${toSafeName(npc.name)} cardStyle ${s.name})}}`
+        ).join(" ");
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Select Card Style for ${npc.name}}} ${styleList}`);
         return;
     }
+
+    if (property === 'triggerdistance' && args.length < 5) {
+        let curr = npc.triggerDistance;
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set Distance for ${npc.name}}} {{Current: ${curr}}} {{Distance (token widths)=[Click Here](!proximitynpc -e ${toSafeName(npc.name)} triggerDistance ?{Distance|${curr}})}}`);
+        return;
+    }
+
+    if (property === 'timeout' && args.length < 5) {
+        let curr = npc.timeout;
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set Timeout for ${npc.name}}} {{Current: ${curr} ms}} {{Timeout (ms)=[Click Here](!proximitynpc -e ${toSafeName(npc.name)} timeout ?{Timeout|${curr}})}}`);
+        return;
+    }
+
+    if (property === 'img' && args.length < 5) {
+        sendChat("NPC Monitor",
+            `/w ${who} &{template:default} {{name=Set Image URL for ${npc.name}}} ` +
+            `{{Current: [Link](${npc.img || 'none'})}} ` +
+            `{{New URL=[Click Here](!proximitynpc -e ${toSafeName(npc.name)} img ?{Enter new image URL|${npc.img || 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/GuildEmblem.png'}})}}`
+        );
+        return;
+    }
+
 
     let value = args.slice(4).join(" ").trim();
-
-    let monitoredNPC = Object.values(state.ProximityNPC.monitoredNPCs).find(npc => npc.name.trim() === npcName);
-
-    if (!monitoredNPC) {
-        sendChat("NPC Monitor", "/w " + who + " Could not find monitored NPC with name: " + npcName);
-        return;
-    }
-
-    switch (property) {
+    switch(property) {
         case 'triggerdistance':
-            let distance = parseFloat(value);
-            if (isNaN(distance) || distance <= 0) {
-                sendChat("NPC Monitor", "/w " + who + " Invalid distance value. Must be a positive number.");
-                monitoredNPC.triggerDistance = state.ProximityNPC.defaultDistance || 2;
-                return;
+            let dist = parseFloat(value);
+            if (isNaN(dist) || dist <= 0) {
+                sendChat("NPC Monitor", `/w ${who} Invalid distance. Using default ${state.ProximityNPC.defaultDistance}.`);
+                npc.triggerDistance = state.ProximityNPC.defaultDistance || 2;
+            } else {
+                npc.triggerDistance = dist;
+                sendChat("NPC Monitor", `/w ${who} ${npc.name} trigger distance set to ${dist}.`);
             }
-            monitoredNPC.triggerDistance = distance;
-            sendChat("NPC Monitor", "/w " + who + " Updated " + monitoredNPC.name + " trigger distance to " + distance);
-            return;
+            break;
         case 'timeout':
-            let timeout = parseInt(value);
-            if (isNaN(timeout) || timeout < 0) {
-                sendChat("NPC Monitor", "/w " + who + " Invalid timeout value. Must be a non-negative integer.");
-                monitoredNPC.timeout = state.ProximityNPC.defaultTimeout || 10000;
-                return;
+            let to = parseInt(value);
+            if (isNaN(to) || to < 0) {
+                sendChat("NPC Monitor", `/w ${who} Invalid timeout. Using default ${state.ProximityNPC.defaultTimeout}.`);
+                npc.timeout = state.ProximityNPC.defaultTimeout || 10000;
+            } else {
+                npc.timeout = to;
+                sendChat("NPC Monitor", `/w ${who} ${npc.name} timeout set to ${to}ms.`);
             }
-            monitoredNPC.timeout = timeout;
-            sendChat("NPC Monitor", "/w " + who + " Updated " + monitoredNPC.name + " timeout to " + timeout + " ms");
-            return;
+            break;
         case 'img':
-            monitoredNPC.img = value;
-            sendChat("NPC Monitor", "/w " + who + " Updated " + monitoredNPC.name + " image URL.");
-            return;
+            npc.img = value;
+            sendChat("NPC Monitor", `/w ${who} ${npc.name} image URL updated.`);
+            break;
         case 'cardstyle':
-            let cardStyle = state.ProximityNPC.cardStyles.find(style => style.name.toLowerCase() === value.toLowerCase());
-            if (!cardStyle) {
-                sendChat("NPC Monitor", "/w " + who + " Invalid card style name. Use !proximitynpc --cardstyles to list available styles.");
-                return;
+            let style = state.ProximityNPC.cardStyles.find(s => s.name.toLowerCase() === value.toLowerCase());
+            if (!style) {
+                sendChat("NPC Monitor", `/w ${who} Card style "${value}" not found. Use --cardstyles to list available styles.`);
+            } else {
+                npc.cardStyle = style.name;
+                sendChat("NPC Monitor", `/w ${who} ${npc.name} style set to ${style.name}.`);
             }
-            monitoredNPC.cardStyle = cardStyle.name;
-            sendChat("NPC Monitor", "/w " + who + " Updated " + monitoredNPC.name + " card style to " + cardStyle.name);
-            return;
+            break;
         default:
-            sendChat("NPC Monitor", "/w " + who + " Unknown property: " + property + ". Valid properties are: triggerdistance, timeout, img, cardstyle.");
-            return;
+            sendChat("NPC Monitor", `/w ${who} Unknown property "${property}".`);
     }
 }
 
 function handleProximityNPCMenu(msg) {
     let who = msg.who;
     
-    sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=NPC Proximity Monitor Menu}} {{[Add/Edit NPC Monitor](!proximitynpc -M)}}{{[List Monitored NPCs](!proximitynpc -l)}} {{[Trigger NPC](!proximitynpc -t)}} {{[Card Styles](!proximitynpc -c)}} {{[Help](!proximitynpc -h)}}`);
-    return;
-}
-
-function handleListMonitoredNPCs(msg) {
-    let who = msg.who || "gm";
-
-    let monitoredNPCs = Object.values(state.ProximityNPC.monitoredNPCs);
-
-    if (monitoredNPCs.length === 0) {
-        sendChat("NPC Monitor", "/w " + who + " No NPCs are currently being monitored. Use !proximitynpc --monitor to add one.");
-        return;
-    }
-
-    let list = monitoredNPCs.map(npc => {
-        let safeName = toSafeName(npc.name);
-        return `{{[${npc.name}](!proximitynpc -M ${safeName})=(Distance: ${npc.triggerDistance}, Timeout: ${npc.timeout} ms, Messages: ${npc.messages.length}, CardStyle: ${npc.cardStyle})}}`;
-    }).join(' ');
-
-
-    sendChat("NPC Monitor", "/w " + who + "&{template:default} {{name=NPC Proximity Monitor List}} "  + list);
-    return;
-}
-
-function handleTriggerNPC(msg) {
-    if (!msg.selected || msg.selected.length === 0) {
-        sendChat("NPC Monitor", "/w " + msg.who + " Please select a token to trigger.");
-        return;
-    }
-
-    let tokenId = msg.selected[0]._id;
-    let token = getObj('graphic', tokenId);
-
-    if (!token) {
-        sendChat("NPC Monitor", "/w " + msg.who + " Could not find selected token.");
-        return;
-    }
-
-    let monitoredNPC = state.ProximityNPC.monitoredNPCs[tokenId];
-
-    if (!monitoredNPC) {
-        sendChat("NPC Monitor", "/w " + msg.who + " Selected token is not a monitored NPC.");
-        return;
-    }
-
-    triggerNPCMessage(monitoredNPC);
+    sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=NPC Proximity Monitor Menu}} {{[Add/Edit NPC Monitor](!proximitynpc -M)}}{{[List Monitored NPCs](!proximitynpc -l)}} {{[Trigger NPC](!proximitynpc -t)}} {{[Card Styles](!proximitynpc -cl)}} {{[Help](!proximitynpc -h)}}`);
     return;
 }
 
 /**
- * Handles NPC token selection and configuration via chat command !proximitynpc (--monitor | -m).
- * @param {Object} msg - The chat message object containing selection data
+ * Lists all currently monitored NPCs and their settings.
+ * @param {Object} msg - The chat message (for recipient).
+ */
+function handleListMonitoredNPCs(msg) {
+    let who = msg.who || "gm";
+    let monitored = Object.values(state.ProximityNPC.monitoredNPCs);
+    if (monitored.length === 0) {
+        sendChat("NPC Monitor", `/w ${who} No NPCs are currently monitored. Use !proximitynpc --monitor to add one.`);
+        return;
+    }
+    let list = monitored.map(npc => {
+        let safeName = toSafeName(npc.name);
+        return `{{[${npc.name}](!proximitynpc -M ${safeName})=(Dist: ${npc.triggerDistance}, Timeout: ${npc.timeout}ms, Messages: ${npc.messages.length}, Style: ${npc.cardStyle})}}`;
+    }).join(" ");
+    sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Monitored NPCs}} ${list}`);
+}
+
+/**
+ * Handles manual NPC triggering.
+ * If a token is selected, triggers that NPC.
+ * If no token is selected and no name is provided, lists all monitored NPCs for selection.
+ * @param {Object} msg - The chat message object.
+ */
+function handleTriggerNPC(msg) {
+    const who = msg.who || "gm";
+    const args = msg.content.trim().split(/\s+/);
+    const token = getTokenFromCall(msg);
+
+    // 1️⃣ If a token is selected → trigger its monitored NPC
+    if (token) {
+        const monitoredNPC = state.ProximityNPC.monitoredNPCs[token.id];
+        if (!monitoredNPC) {
+            sendChat("NPC Monitor", `/w ${who} Token "${token.get('name')}" is not a monitored NPC.`);
+            return;
+        }
+        triggerNPCMessage(monitoredNPC);
+        return;
+    }
+
+    // 2️⃣ No token selected → try by name argument
+    if (args.length > 2) {
+        const npcName = fromSafeName(args.slice(2).join(" "));
+        const entry = Object.entries(state.ProximityNPC.monitoredNPCs)
+            .find(([id, npc]) => npc.name.trim().toLowerCase() === npcName.trim().toLowerCase());
+        if (entry) {
+            const [, npcObj] = entry;
+            triggerNPCMessage(npcObj);
+            return;
+        }
+    }
+
+    // 3️⃣ No token and no matching name → list all monitored NPCs to choose from
+    const npcEntries = Object.entries(state.ProximityNPC.monitoredNPCs);
+    if (npcEntries.length === 0) {
+        sendChat("NPC Monitor", `/w ${who} No monitored NPCs are currently active.`);
+        return;
+    }
+
+    const npcButtons = npcEntries.map(([id, npc]) => {
+        const safeName = toSafeName(npc.name);
+        return `{{[${npc.name}](!proximitynpc -t ${safeName})}}`;
+    }).join(" ");
+
+    sendChat("NPC Monitor",
+        `/w ${who} &{template:default} {{name=Trigger a Monitored NPC}} ${npcButtons}`
+    );
+}
+
+/**
+ * Edits or creates a new MonitoredNPC from the selected token.
+ * @param {Object} msg - The chat message with possible selection.
+ * @returns {void}
  */
 function handleMonitorNPC(msg) {
     let who = msg.who;
-
-    // If a token is selected, use it
-    if (msg.selected && msg.selected.length > 0) {
-        let tokenId = msg.selected[0]._id;
-        let token = getObj('graphic', tokenId);
-        if (!token) {
-            sendChat("NPC Monitor", "/w " + who + " Could not find the selected token.");
-            return;
-        }
-
-        // If not monitored yet, create and show dialog
-        if (!state.ProximityNPC.monitoredNPCs[tokenId]) {
+    let token = getTokenFromCall(msg);
+    if (token) {
+        // Update or create monitored entry
+        if (!state.ProximityNPC.monitoredNPCs[token.id]) {
             createMonitoredNPCFromToken(msg, token);
-            return;
+        } else {
+            showEditMonitorNPCDialog(msg, token);
         }
-
-        // Already monitored: update and show edit dialog
-        showEditMonitorNPCDialog(msg, token);
         return;
     }
-
-    // If no token is selected, show menu of available tokens
+    // If no token given, show a menu of tokens on the page
     let tokens = findObjs({ type: 'graphic', subtype: 'token', layer: 'objects' });
     if (tokens.length === 0) {
-        sendChat("NPC Monitor", "/w " + who + " No tokens found on the page to monitor.");
+        sendChat("NPC Monitor", `/w ${who} No tokens found to monitor on this page.`);
         return;
     }
-
-    // Show menu of tokens to select for monitoring
-    // When showing menu of tokens
-    let menu = tokens.map(t => {
-        let safeName = toSafeName(t.get('name'));
-        return `{{[${t.get('name')}](!proximitynpc -M ${safeName})}}`;
-    }).join(' ');
-
-    sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Select a Token to Monitor}} ${menu}`);
+    let menu = tokens.map(t => `{{[${t.get('name')}](!proximitynpc -M ${toSafeName(t.get('name'))})}}`).join(" ");
+    sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Select Token to Monitor}} ${menu}`);
 }
 
-
 /**
- * Calculates the distance between two points using Pythagorean theorem.
- * @param {number} x1 - First point X coordinate
- * @param {number} y1 - First point Y coordinate
- * @param {number} x2 - Second point X coordinate
- * @param {number} y2 - Second point Y coordinate
- * @returns {number} The calculated distance
+ * Calculates distance between two points (Euclidean).
+ * @param {number} x1 - X coord of first point.
+ * @param {number} y1 - Y coord of first point.
+ * @param {number} x2 - X coord of second point.
+ * @param {number} y2 - Y coord of second point.
+ * @returns {number} The distance.
  */
 function calculateDistance(x1, y1, x2, y2) {
-    let deltaX = x2 - x1;
-    let deltaY = y2 - y1;
-    return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    let dx = x2 - x1, dy = y2 - y1;
+    return Math.sqrt(dx*dx + dy*dy);
 }
 
-/**
- * Checks proximity for all moving tokens against monitored NPCs.
- * @param {Graphic} movedToken - The token that moved
+/** 
+ * Checks all monitored NPCs whenever a token moves. Triggers messages if in range.
+ * @param {Graphic} movedToken - The token that moved.
  */
 function checkAllProximities(movedToken) {
-    let movedTokenId = movedToken.id;
-    let movedTokenPage = movedToken.get('pageid');
-    let movedTokenWidth = movedToken.get('width');
-    let movedTokenX = movedToken.get('left') + (movedTokenWidth / 2);
-    let movedTokenY = movedToken.get('top') + (movedToken.get('height') / 2);
-
-    // Get player name from token
+    let movedId = movedToken.id;
+    let pageId = movedToken.get('pageid');
+    let movedCenterX = movedToken.get('left') + movedToken.get('width')/2;
+    let movedCenterY = movedToken.get('top') + movedToken.get('height')/2;
     let playerName = getPlayerNameFromToken(movedToken);
-
-    // Check against all monitored NPCs
-    Object.keys(state.ProximityNPC.monitoredNPCs).forEach(npcTokenId => {
-        let npc = state.ProximityNPC.monitoredNPCs[npcTokenId];
-
-        // Only check if on same page
-        if (npc.pageId !== movedTokenPage) return;
-
-        // Prevent an NPC token from triggering itself if it's being moved
-        if (movedTokenId === npcTokenId) return;
-
-        // Update NPC position if it has moved
-        let npcToken = getObj('graphic', npcTokenId);
-        if (npcToken && (npcToken.get('left') !== npc.lastPosition.x || npcToken.get('top') !== npc.lastPosition.y)) {
-            let npcWidth = npcToken.get('width');
-            npc.centerX = npcToken.get('left') + (npcWidth / 2);
-            npc.centerY = npcToken.get('top') + (npcToken.get('height') / 2);
-            npc.lastPosition = { x: npcToken.get('left'), y: npcToken.get('top') };
+    Object.entries(state.ProximityNPC.monitoredNPCs).forEach(([npcId, npc]) => {
+        if (npc.pageId !== pageId || npcId === movedId) return;
+        let npcToken = getObj('graphic', npcId);
+        if (!npcToken) return;
+        // Update NPC position
+        let newX = npcToken.get('left'), newY = npcToken.get('top');
+        if (newX !== npc.lastPosition.x || newY !== npc.lastPosition.y) {
+            npc.centerX = newX + npcToken.get('width')/2;
+            npc.centerY = newY + npcToken.get('height')/2;
+            npc.lastPosition = {x: newX, y: newY};
         }
-
-        // Calculate distance using simple distance formula
-        let distance = calculateDistance(npc.centerX, npc.centerY, movedTokenX, movedTokenY);
-
-        // Create unique key for this token-NPC combination
-        let triggerKey = movedTokenId + '_' + npcTokenId;
-
-        if (distance <= npc.triggerDistance) {
-            // Only trigger if this token hasn't triggered for this NPC recently
-            if (!triggeredTokens[triggerKey]) {
-                triggerNPCMessage(npc, playerName);
-                triggeredTokens[triggerKey] = true;
-
-                // Clear the trigger after 30 seconds to allow re-triggering
-                setTimeout(() => {
-                    if (npc.timeout === 0) return; // Permanent trigger, do not clear
-                    delete triggeredTokens[triggerKey];
-                }, npc.timeout > 0 ? npc.timeout : 1 || 10000);
-            }
+        let distance = calculateDistance(npc.centerX, npc.centerY, movedCenterX, movedCenterY);
+        let threshold = npc.triggerDistance * npcToken.get('width') + (npcToken.get('width')/2);
+        let key = movedId + '_' + npcId;
+        if (distance <= threshold && !triggeredTokens[key]) {
+            triggerNPCMessage(npc, playerName);
+            triggeredTokens[key] = true;
+            setTimeout(() => {
+                if (npc.timeout !== 0) delete triggeredTokens[key];
+            }, npc.timeout > 0 ? npc.timeout : 1);
         }
     });
 }
 
 /**
- * Extracts player name from a token via its represented character.
- * @param {Graphic} token - The token to get the player name from
- * @returns {string} The player/character name or 'Guild Member' as fallback
+ * Retrieves a player/character name from a token for personalization.
+ * @param {Graphic} token - The moved token.
+ * @returns {string} Player name or default "Guild Member".
  */
 function getPlayerNameFromToken(token) {
-    let characterId = token.get('represents');
-    if (characterId) {
-        let character = getObj('character', characterId);
-        if (character) {
-            return character.get('name').trim() || 'Guild Member';
-        }
+    let charId = token.get('represents');
+    if (charId) {
+        let character = getObj('character', charId);
+        if (character) return character.get('name').split(" ")[0] || 'Guild Member';
     }
     return 'Guild Member';
 }
 
 /**
- * Gets a random message from an array of MessageObjects.
- * 
- * Custom message object can have:
- * - content: The message text (required)
- * - weight: Relative chance of being selected (default 1)
- * - cardStyle: Optional card style to override NPC default
- *  
- * @param {MessageObject[]} messageObjects - Array of message objects to choose from
- * @returns {MessageObject} A randomly selected message object
+ * Chooses a random message from an array, weighted by `messageObject.weight`.
+ * @param {MessageObject[]} messages - Array of message objects.
+ * @returns {MessageObject} The selected message.
  */
-function getRandomMessage(messageObjects) {
-    if (!messageObjects || messageObjects.length === 0) {
-        return {
-            content: "They are lost in thought, not even looking your way."
-        }
-    };
-    let messages = [];
-    messageObjects.forEach(messageObject => {
-        let weight = messageObject.weight || 1;
-        for (let i = 0; i < weight; i++) {
-            messages.push(messageObject);
-        }
+function getRandomMessage(messages) {
+    if (!messages || messages.length===0) {
+        return new MessageObject("They are lost in thought...", 1);
+    }
+    let pool = [];
+    messages.forEach(m => {
+        let w = m.weight || 1;
+        for (let i=0; i<w; i++) pool.push(m);
     });
-    return messages[Math.floor(Math.random() * messages.length)];
+    return pool[Math.floor(Math.random()*pool.length)];
 }
 
 /**
@@ -978,9 +1196,6 @@ function triggerNPCMessage(npc, playerName="Guild Member") {
 
     // Send as whisper to the player who triggered it
     sendChat(npc.name, card);
-
-    // Prevent self-triggering
-    if (getPresetNPCByName(playerName)) return;
 }
 
 /**
@@ -994,18 +1209,16 @@ function autoMonitorNPCs() {
     allTokens.forEach(token => {
         let tokenName = token.get('name');
 
-        let presetNPC = getPresetNPCByName(tokenName);
-
+        let presetNPC = state.ProximityNPC.presetNPCs.find(npc => npc.name === tokenName);
         if (presetNPC) {
             // Skip if already monitored
             if (Object.values(state.ProximityNPC.monitoredNPCs).some(npc => npc.name === tokenName)) return;
 
             let tokenWidth = token.get('width');
-            let triggerDistancePixels = tokenWidth * presetNPC.distance;
 
             state.ProximityNPC.monitoredNPCs[token.id] = new MonitoredNPC(
                 tokenName,
-                triggerDistancePixels,
+                presetNPC.distance,
                 token.get('pageid'),
                 token.get('left') + (tokenWidth / 2),
                 token.get('top') + (token.get('height') / 2),
