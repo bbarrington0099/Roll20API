@@ -107,7 +107,13 @@ state.ProximityNPC = {
             3,
             [
                 new MessageObject('The Guild Master looks up, you see a look of intense thought clear from his eyes. "Ah {playerName}, I hope you\'re keeping your wits sharp; I\'ve got some jobs coming up for you."', 3),
-                new MessageObject('Tharos nods at you, "Good to see you again, {playerName}. Remember, the guild is always here if you need assistance."', 3, 'Warm')
+                new MessageObject('Tharos nods at you, "Good to see you again, {playerName}. Remember, the guild is always here if you need assistance."', 3, 'Warm'),
+                new MessageObject('"Tempus favors the bold, {playerName}, but he also favors the prepared. Make sure you\'re both before heading out." He taps Ruinbreaker\'s haft thoughtfully.', 2),
+                new MessageObject('His booming laugh echoes through the hall. "That reminds me of the time I faced that wyvern! Though you didn\'t hear it from me..."', 1),
+                // Relationship messages
+                new MessageObject('"Keoti came from the army with the highest of recommendations, my former battle body claimed that he had "Never seen a tabaxi move so fast with a greataxe" - he\'s earned every bit of trust I place in him."', 2),
+                new MessageObject('"When Risha tried to steal Ruinbreaker, I nearly threw her in the dungeons. But after realizing what she\'d done to it... brilliant. Sometimes second chances create our strongest allies."', 2),
+                new MessageObject('"Ilikan may be our groundskeeper, but he has the patience of the giants who raised him. The guild wouldn\'t be standing without his careful maintenance."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/TharosRaggenthraw.png',
             'GuildMaster'
@@ -116,7 +122,14 @@ state.ProximityNPC = {
             'Kinris Morranfew',
             2,
             [
-                new MessageObject('Smiling as she wipes down the bar, "{playerName}, long time no see! Need a drink?"', 3)
+                new MessageObject('Smiling as she wipes down the bar, "{playerName}, long time no see! Need a drink?"', 3),
+                new MessageObject('"Tell me everything, {playerName} - the good, the bad, and the parts you think nobody wants to hear. I\'m listening." She leans in with genuine interest.', 2),
+                new MessageObject('"This new brew might be my best yet! Care to be my taste-tester, {playerName}?" She gestures to a foaming mug with a mischievous grin.', 2),
+                new MessageObject('"Sometimes the strongest healing happens over a good drink and better company. You look like you could use both."', 1),
+                // Relationship messages
+                new MessageObject('"Lumen reminds me of myself at his age - so much heartache, but such determination. I make sure he gets extra sweets when Keoti isn\'t looking."', 2),
+                new MessageObject('"Bolagor and I have an arrangement - my best ale for his spiciest stew. The resulting feast nearly brought Tharos to tears last Winter\'s Crest."', 2),
+                new MessageObject('"Snek once tried to help me serve drinks. We lost three mugs and gained a wonderful story. That kobold means well, even when he\'s a disaster."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/KinrisMorranfew.png'
         ),
@@ -124,7 +137,14 @@ state.ProximityNPC = {
             'Ovlan Kalek',
             1.5,
             [
-                new MessageObject('His head turns towards you but his eyes remain pinned to a thick tome... "Questions about my book? Oh for you {playerName} I\'ll even sign it."', 3)
+                new MessageObject('His head turns towards you but his eyes remain pinned to a thick tome... "Questions about my book? Oh for you {playerName} I\'ll even sign it."', 3),
+                new MessageObject('The boy is quite well in his studies, you\'d be foolish to underestimate him in sparring {playerName}', 2),
+                new MessageObject('"Fascinating! {playerName}, come look at this passage - it perfectly describes the hunting patterns of the very creature you faced last week!"', 2),
+                new MessageObject('He looks up, startled as if waking from a dream. "Oh! {playerName}, I was just... how long have I been reading?"', 1),
+                // Relationship messages
+                new MessageObject('"Young Auren has a mind for graviturgy that I haven\'t seen in decades. Last week he corrected my calculations on feather fall... he was right, of course."', 2),
+                new MessageObject('"Jade and I compiled the guild archives together. Her memory for detail is... unsettlingly good. Former spies make excellent librarians."', 2),
+                new MessageObject('"Fiona once helped me track a fey-touched beast for my research. Her connection to both drake and fey wilds made the difference between success and disaster."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/OvlanKalek.png'
         ),
@@ -132,7 +152,14 @@ state.ProximityNPC = {
             'Varon Tavis',
             2,
             [
-                new MessageObject('"You\'re welcome to use the forge, there\'s an extra hammer on the wall there." He points to a long line of hanging hammers.', 3)
+                new MessageObject('"You\'re welcome to use the forge, there\'s an extra hammer on the wall there." He points to a long line of hanging hammers.', 3),
+                new MessageObject('"Steel doesn\'t lie, {playerName}. It shows every flaw and every strength. People could learn from that."', 2),
+                new MessageObject('"This blade needs more tempering. Show me your grip, {playerName} - proper form saves fingers."', 2),
+                new MessageObject('"In the wilds, a dull blade gets you killed. Here, it just gets you a lecture from me." He almost smiles.', 1),
+                // Relationship messages
+                new MessageObject('"Tharos gave me a place when my own clan wouldn\'t. I\'d break every hammer in this forge before I betrayed that trust."', 2),
+                new MessageObject('"Risha\'s \'improvements\' to my tools usually work, eventually. The exploding tongs were... educational." He rubs a faint scar on his arm.', 2),
+                new MessageObject('"Ilikan understands materials - wood, stone, metal. We repaired the main gate together after that ogre incident. Good worker."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/VaronTavis.png'
         ),
@@ -140,15 +167,29 @@ state.ProximityNPC = {
             'Caelum Riversong',
             2,
             [
-                new MessageObject('"Ah, {playerName}, careful with that bandage. Let me show you a proper technique—your hands could save lives yet."', 3)
+                new MessageObject('"Ah, {playerName}, careful with that bandage. Let me show you a proper technique—your hands could save lives yet."', 3),
+                new MessageObject('"My research is going well {playerName}, but I really need our shippment of exotic herbs and oils from Kantra to come in..." You now notice a new crate of emty vial awaiting their contents.', 2),
+                new MessageObject('"Lathander\'s light guide your path, {playerName}. And if it doesn\'t, my poultices will have to suffice."', 2),
+                new MessageObject('"Precision saves lives, {playerName}. Whether in surgery or spellcasting, the principle remains."', 1),
+                // Relationship messages
+                new MessageObject('"Ilikan and I often pray to Lathander together at dawn. His giant-taught prayers have a... grounding quality to them."', 2),
+                new MessageObject('"Kinris supplies me with the strongest spirits for disinfecting wounds. Her brew stings worse than any monster\'s bite, but it works."', 2),
+                new MessageObject('"I treated Fiona\'s drake when it ate something it shouldn\'t have. Remarkable creature - even its digestive troubles were impressive."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/CaelumRiversong.png'
         ),
         new PresetNPC(
             'Risha Swiftdancer',
-            1.5,
+            1,
             [
-                new MessageObject('Risha glances at you with a quick grin. "Got something to fix or someone to trick, {playerName}? Either way, I\'m your gal."', 3)
+                new MessageObject('Risha pays little mind until you are close enough to break her concentration. "Give me an idea, {playerName}; some absolutely wild proposition. Let\'s see what we can make from it"', 3),
+                new MessageObject('"They said it couldn\'t be done, {playerName}. Want to help me prove them wrong again?" Her eyes gleam with challenge.', 2),
+                new MessageObject('"This gadget nearly took my finger off, but the principle is sound! Come look, {playerName}!"', 2),
+                new MessageObject('"Rules are just suggestions written by people who lacked imagination, {playerName}."', 1),
+                // Relationship messages
+                new MessageObject('"Tharos could have had me hanged. Instead he saw potential in my \'modifications\' to his axe. Never told him I was just trying to lighten it to steal faster."', 2),
+                new MessageObject('"Varon grumbles about my \'tinkering\' but he\'s the first to test my new designs. We built a self-sharpening whetstone that actually works... mostly."', 2),
+                new MessageObject('"Snek brings me the most interesting scrap metal he finds. Half of it\'s junk, but that other half... pure inspiration."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/RishaSwiftdancer.png'
         ),
@@ -156,7 +197,14 @@ state.ProximityNPC = {
             'Lumen Silverflock',
             1.5,
             [
-                new MessageObject('Quietly standing by the hall, Lumen nods at you. "I\'ll get that cleaned up, {playerName}. Don\'t worry, it\'ll be perfect."', 3)
+                new MessageObject('A mug crashes against the wall near you. "I\'ll get that cleaned up, {playerName}. Don\'t worry, I move a mop as well as a sword."', 1),
+                new MessageObject('You notice Lumn feigning attacks with an invisible sword. "Master Keoti says there\s alway time to practice"', 3),
+                new MessageObject('"Kelemvor teaches that every life deserves justice, {playerName}. That\'s why I train so hard."', 2),
+                new MessageObject('"Could you show me that parry again, {playerName}? I want to get it perfect before Master Keoti returns."', 2),
+                // Relationship messages
+                new MessageObject('"Master Keoti found me practicing alone one night and just... started teaching me. He doesn\'t say much, but he shows me everything."', 2),
+                new MessageObject('"Kinris lets me help in the kitchen sometimes. She says I remind her of... well, she gets quiet after that. But she\'s always kind."', 2),
+                new MessageObject('"The guild party that rescued me... I don\'t remember all their names, but Tharos was there. His mane was the first thing I saw in the ruins."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/LemunSilverflock.png'
         ),
@@ -164,7 +212,14 @@ state.ProximityNPC = {
             'Bolagor Bonejaw',
             2,
             [
-                new MessageObject('"Hungry, {playerName}? I can whip up something that\'ll put hair on your chest. Don\'t complain if it bites back!"', 3)
+                new MessageObject('"Hungry, {playerName}? I can whip up something that\'ll put hair on your chest. Don\'t complain if it bites back!"', 3),
+                new MessageObject('"That merchant tried to overcharge me again. He won\'t make that mistake twice, {playerName}."', 2),
+                new MessageObject('"My master always said: good food makes good fighters. So eat up, {playerName} - we need you strong."', 2),
+                new MessageObject('"This stew has three different peppers from the eastern markets. Care to test your mettle, {playerName}?"', 1),
+                // Relationship messages
+                new MessageObject('"Jade and I handle the guild\'s finances. She negotiates contracts, I handle supplies. Between us, we keep this place from bankruptcy."', 2),
+                new MessageObject('"Kinris and I have a standing bet on who can create the more... memorable beverage. Last time, her ale made a dwarf cry. I respect that."', 2),
+                new MessageObject('"Little Auren is the only one who remembers every ingredient in my seven-pepper stew. Sharp mind, that one."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/BolagorBonejaw.png'
         ),
@@ -172,7 +227,14 @@ state.ProximityNPC = {
             'Jade Clearrock',
             2,
             [
-                new MessageObject('"Good day, {playerName}. Your quest report is ready for filing—or are you here to pick up a new adventure?" She gestures to the ledger with a serene smile.', 3)
+                new MessageObject('"Good day, {playerName}. I don\t have any quests available at the moment, but for any record look-ups..." She gestures to the ledger with a serene smile.', 3),
+                new MessageObject('"Tymora smiles on the prepared, {playerName}. What kind of quests would you like me to look out for?"', 2),
+                new MessageObject('"Looking for advice on certain aspects of adventuring, {playerName}?" You can almost sense the usefulness this conversation could have.', 2),
+                new MessageObject('"Diplomacy first, blades if necessary. That was my motto in the field, and it serves well here too."', 1),
+                // Relationship messages
+                new MessageObject('"Ovlan and I compiled the guild archives together. His memory for arcane lore is matched only by mine for... well, let\'s call it professional details."', 2),
+                new MessageObject('"Bolagor drives the hardest bargain I\'ve seen since my espionage days. I rather enjoy our negotiations - it keeps me sharp."', 2),
+                new MessageObject('"Who comes to me for stories of my adventuring days. She says they make good songs. I suppose everyone deserves a legend, even former spies."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/JadeClearrock.png'
         ),
@@ -180,7 +242,14 @@ state.ProximityNPC = {
             'Fiona Wildfist',
             2,
             [
-                new MessageObject('Fiona crouches beside her drake companion, who nudges you gently. "Mind your step, {playerName}, and say hello properly to my friend there."', 3)
+                new MessageObject('Fiona crouches beside her drake companion, who nudges you gently. "Mind your step, {playerName}, and say hello properly to my friend there."', 3),
+                new MessageObject('"Selûne\'s phases guide all creatures, {playerName}. Even the wildest beast has its rhythms and reasons."', 2),
+                new MessageObject('"The griffons need extra grooming today, {playerName}. Care to help? They quite like you."', 2),
+                new MessageObject('"My drake remembers you, {playerName}. They don\'t forget kindness, no matter how small."', 1),
+                // Relationship messages
+                new MessageObject('"Ilikan proposed to me during the great meteor shower. He said each falling star was a promise for our future. My practical husband has his moments of poetry."', 2),
+                new MessageObject('"Auren gets his curiosity from me, but his patience from his father. Between us, we\'re raising quite the remarkable young man."', 2),
+                new MessageObject('"Snek helps me with the smaller creatures. They trust him in a way they don\'t trust most people. There\'s a pure heart beneath that chatter."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/FionaMirage.png'
         ),
@@ -188,7 +257,14 @@ state.ProximityNPC = {
             'Ilikan Wildfist',
             2,
             [
-                new MessageObject('"Everything in its place, {playerName}. Care to help me mend this armor? You\'ll learn a thing or two."', 3)
+                new MessageObject('"Everything in its place, {playerName}. Care to help repair this table leg? You\'ll learn a thing or two."', 3),
+                new MessageObject('"My giant-kin taught me: every avalanche begins as a single pebble. Good work starts small, {playerName}."', 2),
+                new MessageObject('"Lathander\'s dawn reminds us that even broken things can be made new. This armor just needs patience, {playerName}."', 2),
+                new MessageObject('"The gardens need tending, {playerName}. There\'s peace in working with the earth - care to join me?"', 1),
+                // Relationship messages
+                new MessageObject('"Fiona still has the wild fey spark that drew me to her, but now it\'s tempered by motherhood. Our son has her brilliant mind and, thankfully, my patience."', 2),
+                new MessageObject('"Caelum and I share dawn prayers to Lathander. He tends to souls while I tend to the earth, but we both serve renewal in our ways."', 2),
+                new MessageObject('"I teach Auren Giant not just for language, but for perspective. The world looks different when you understand how giants think."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/IlikanWildfist.png'
         ),
@@ -196,7 +272,14 @@ state.ProximityNPC = {
             'Auren Wildfist',
             1.5,
             [
-                new MessageObject('"I have the order memorized, {playerName}. Would you like me to fetch it for you, or do you need help with spell prep?"', 3)
+                new MessageObject('"I have the order memorized, {playerName}. Would you like me to fetch it for you, or are we feeling adventurous?" Auren looks at you with a shine in his eye.', 3),
+                new MessageObject('"Master Ovlan says gravity affects everything, even magic! Isn\'t that fascinating, {playerName}?"', 2),
+                new MessageObject('"Father taught me this Giant phrase for \'well-met,\' {playerName}. Would you like to learn it?"', 2),
+                new MessageObject('"I\'ve been practicing my serving posture. Is my form correct, {playerName}?"', 1),
+                // Relationship messages
+                new MessageObject('"Mother lets me help with the baby griffons sometimes. She says I have her way with creatures, but I think they just like the treats I sneak them."', 2),
+                new MessageObject('"Master Ovlan says I\'m his best student, but I think he says that to all his apprentices. Still, it makes me want to work harder."', 2),
+                new MessageObject('"Father says our family follows Lathander because every morning is a new beginning. I like that - it means I can always try again tomorrow."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/AurenWildfist.png'
         ),
@@ -204,7 +287,14 @@ state.ProximityNPC = {
             'Keoti Fang',
             3,
             [
-                new MessageObject('Keoti\'s amber eyes meet yours, sharp as a blade. "Stay alert, {playerName}. I don\'t tolerate slackers in my halls."', 3)
+                new MessageObject('Keoti\'s amber eyes meet yours, sharp as a blade. "Stay alert, {playerName}. Let me know of any trouble."', 3),
+                new MessageObject('"Sehanine guides us through dreams and darkness both, {playerName}. Trust your instincts as you would her moonlight."', 2),
+                new MessageObject('"I\'ve walked your patrol route, {playerName}. Report anything unusual immediately."', 2),
+                new MessageObject('"The scar teaches what the victory forgets, {playerName}. Learn from both."', 1),
+                // Relationship messages
+                new MessageObject('"Lumen trains harder than soldiers twice his age. The boy carries grief like armor, but I\'m teaching him to wear it like a cloak instead."', 2),
+                new MessageObject('"Tharos and I served in different companies during the war, but we shared the same nightmares. Only difference is, he built a guild while I found a god."', 2),
+                new MessageObject('"I patrol with Fiona\'s drake sometimes. The creature sees things even I miss. Useful partner, if you don\'t mind the shedding."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/KeotiFang.png'
         ),
@@ -212,7 +302,14 @@ state.ProximityNPC = {
             'Snek Littlefoot',
             1.5,
             [
-                new MessageObject('Snek darts around you, chattering, "{playerName}! Did you hear the news? I might have... maybe... gotten it a bit wrong..."', 3)
+                new MessageObject('Snek darts around you, chattering, "{playerName}! Did you hear the news? I might have... maybe... gotten it a bit wrong..."', 3),
+                new MessageObject('"The sparrows told me the most incredible thing, {playerName}! Well, I think that\'s what they said..."', 2),
+                new MessageObject('"Tymora must be smiling on us today, {playerName}! I found an extra shiny coin by the stables!"', 2),
+                new MessageObject('"I\'m not supposed to tell anyone, but since it\'s you, {playerName}..." He immediately proceeds to share everything.', 1),
+                // Relationship messages
+                new MessageObject('"Fiona lets me help with the animals! Well, the small ones. The big ones step on me sometimes. But the rabbits love me!"', 2),
+                new MessageObject('"Who sings the prettiest songs! I try to remember the words but they get mixed up. She says it\'s the feeling that matters anyway."', 2),
+                new MessageObject('"Kinris is my favorite! She gives me the leftover fruit from her brewing and never gets mad when I spill things. Well, not TOO mad."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/SnekLittlefoot.png'
         ),
@@ -220,7 +317,14 @@ state.ProximityNPC = {
             'Who Wingfall',
             2,
             [
-                new MessageObject('Who strums her lute softly, looking up. "A song for you, {playerName}, or just some news from the guild? Either way, I\'ve got you covered."', 3)
+                new MessageObject('Who strums her lute softly, looking up. "A song for you, {playerName}, or should I bring you something from the kitchen?"', 3),
+                new MessageObject('"My father\'s song speaks of courage in dark places, {playerName}. I think you\'d appreciate the third verse."', 2),
+                new MessageObject('"Tymora led me to this guild, {playerName}. Now I have endless stories to set to music!"', 2),
+                new MessageObject('"This new melody came to me in a dream, {playerName}. Would you be the first to hear it?"', 1),
+                // Relationship messages
+                new MessageObject('"Jade tells the most amazing stories from her adventuring days! I\'m turning her escape from the Shadow Guild into an epic ballad."', 2),
+                new MessageObject('"Auren and I practice serving together. For a nine-year-old, he has remarkable rhythm. I think he\'d make a fine bard if wizardry doesn\'t work out."', 2),
+                new MessageObject('"Tharos took a chance on a street performer, and now I have a home. I write songs about his wyvern fight, but I make the ending happier than it really was."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/WhoWingfall.png'
         )
@@ -1027,6 +1131,11 @@ function handleEditMonitoredNPC(msg) {
     }
 }
 
+/**
+ * Displays a menu of buttons with command paths set up
+ * Usage: !proximitynpc -m
+ * @param {Object} msg - The chat message object.
+ */ 
 function handleProximityNPCMenu(msg) {
     let who = msg.who;
     
