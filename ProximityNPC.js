@@ -315,6 +315,43 @@ function setupNPCProximity() {
 }
 
 /**
+ * Gets the best available image URL for a token in priority order:
+ * 1. Character avatar
+ * 2. Token image
+ * 3. Default image from state
+ * 4. Empty string
+ * @param {Graphic} token - The token to get the image for
+ * @returns {string} The best available image URL
+ */
+function getBestTokenImage(token) {
+    // Check if token represents a character and get avatar
+    let charId = token.get('represents');
+    if (charId) {
+        let character = getObj('character', charId);
+        if (character) {
+            let avatar = character.get('avatar');
+            if (avatar && avatar.trim() !== '') {
+                return avatar;
+            }
+        }
+    }
+    
+    // Fall back to token image
+    let tokenImg = token.get('imgsrc');
+    if (tokenImg && tokenImg.trim() !== '') {
+        return tokenImg;
+    }
+    
+    // Fall back to default image from state
+    if (state.ProximityNPC.defaultImagePath && state.ProximityNPC.defaultImagePath.trim() !== '') {
+        return state.ProximityNPC.defaultImagePath;
+    }
+    
+    // Final fallback to empty string
+    return '';
+}
+
+/**
  * Creates a MonitoredNPC entry for the given token and opens its edit dialog.
  * @param {Object} msg - The chat message for whispering back.
  * @param {Graphic} token - The token to monitor.
@@ -329,7 +366,7 @@ function createMonitoredNPCFromToken(msg, token) {
         token.get('top') + token.get('height')/2,
         { x: token.get('left'), y: token.get('top') },
         state.ProximityNPC.defaultTimeout || 10000,
-        state.ProximityNPC.defaultImagePath || 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/GuildEmblem.png',
+        getBestTokenImage(token),
         [],
         state.ProximityNPC.cardStyles[0].name || 'Default'
     );
@@ -491,7 +528,7 @@ function handleEditMessages(msg) {
             sendChat("NPC Monitor", `/w ${who} Invalid message index.`);
             return;
         }
-        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Edit Message Content}} {{Current: ${monitoredMessage.content}}} {{Enter new text. Use {playerName} as a placeholder: [Click Here](!proximitynpc -M ${safeNPCName} messages edit_content_save ${msgIndex} ?{Message Text})}}`);
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Edit ${npcName} Message Content}} {{Current: ${monitoredMessage.content}}} {{Enter new text. Use {playerName} as a placeholder: [Click Here](!proximitynpc -M ${safeNPCName} messages edit_content_save ${msgIndex} ?{Message Text})}}`);
         return;
     }
 
@@ -544,7 +581,7 @@ function handleEditMessages(msg) {
         
         let messageToEdit = monitoredNPC.messages[actualIndex];
         // Show edit options for the specific message. Note: Display shows actualIndex + 1 for user clarity.
-        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Edit Message ${actualIndex + 1}}} {{Card Style: ${messageToEdit.cardStyle || 'Default'}}} {{Content: ${messageToEdit.content}}} {{Weight: ${messageToEdit.weight}}} {{[Edit Content](!proximitynpc -M ${safeNPCName} messages edit_content ${actualIndex})}} {{[Edit Weight](!proximitynpc -M ${safeNPCName} messages edit_weight ${actualIndex})}} {{[Change Card Style](!proximitynpc -M ${safeNPCName} messages edit_cardstyle ${actualIndex})}} {{[Delete Message](!proximitynpc -M ${safeNPCName} messages delete ${actualIndex})}} {{[Back to Messages](!proximitynpc -M ${safeNPCName} messages)}}`);
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Edit ${npcName} Message ${actualIndex + 1}}} {{Card Style: ${messageToEdit.cardStyle || 'Default'}}} {{Content: ${messageToEdit.content}}} {{Weight: ${messageToEdit.weight}}} {{[Edit Content](!proximitynpc -M ${safeNPCName} messages edit_content ${actualIndex})}} {{[Edit Weight](!proximitynpc -M ${safeNPCName} messages edit_weight ${actualIndex})}} {{[Change Card Style](!proximitynpc -M ${safeNPCName} messages edit_cardstyle ${actualIndex})}} {{[Delete Message](!proximitynpc -M ${safeNPCName} messages delete ${actualIndex})}} {{[Back to Messages](!proximitynpc -M ${safeNPCName} messages)}}`);
         return;
     }
 
@@ -571,7 +608,7 @@ function handleEditMessages(msg) {
             return;
         }
         let safeNPCName = toSafeName(monitoredNPC.name);
-        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Edit Message Content}} {{Current: ${monitoredMessage.content}}} {{New Content: [Click Here](!proximitynpc -M ${safeNPCName} messages edit_content_save ${msgIndex} ?{Message Text|${monitoredMessage.content}})}}`);
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Edit ${npcName} Message Content}} ${msgIndex} {{Current: ${monitoredMessage.content}}} {{New Content: [Click Here](!proximitynpc -M ${safeNPCName} messages edit_content_save ${msgIndex} ?{Message Text|${monitoredMessage.content}})}}`);
         return;
     }
 
@@ -583,7 +620,7 @@ function handleEditMessages(msg) {
             return;
         }
         monitoredNPC.messages[msgIndex].content = newContent;
-        sendChat("NPC Monitor", `/w ${who} Message content updated.`);
+        sendChat("NPC Monitor", `/w ${who} ${npcName} Message ${msgIndex + 1} content updated.`);
         handleEditMessages({ content: `!proximitynpc -M ${safeNPCName} messages`, who: who });
         return;
     }
@@ -596,7 +633,7 @@ function handleEditMessages(msg) {
             return;
         }
         let safeNPCName = toSafeName(monitoredNPC.name);
-        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Edit Message Weight}} {{Current Weight: ${monitoredMessage.weight}}} {{New Weight: [Click Here](!proximitynpc -M ${safeNPCName} messages edit_weight_save ${msgIndex} ?{Weight|${monitoredMessage.weight}})}}`);
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Edit ${npcName} Message ${msgIndex + 1} Weight}} {{Current Weight: ${monitoredMessage.weight}}} {{New Weight: [Click Here](!proximitynpc -M ${safeNPCName} messages edit_weight_save ${msgIndex} ?{Weight|${monitoredMessage.weight}})}}`);
         return;
     }
 
@@ -605,7 +642,7 @@ function handleEditMessages(msg) {
         let newWeight = parseInt(args[6]);
         if (isNaN(newWeight) || newWeight <= 0) newWeight = 1;
         monitoredNPC.messages[msgIndex].weight = newWeight;
-        sendChat("NPC Monitor", `/w ${who} Message weight updated to ${newWeight}.`);
+        sendChat("NPC Monitor", `/w ${who} ${npcName} Message ${msgIndex + 1} weight updated to ${newWeight}.`);
         handleEditMessages({ content: `!proximitynpc -M ${safeNPCName} messages`, who: who });
         return;
     }
@@ -616,7 +653,7 @@ function handleEditMessages(msg) {
             `{{[${style.name}](!proximitynpc -M ${safeNPCName} messages set_cardstyle ${msgIndex} ${toSafeName(style.name)})}}`
         ).join(' ');
         sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set Message Card Style}} ${styleList} \
-    {{[Back to Edit Message](!proximitynpc -M ${safeNPCName} messages edit ${msgIndex})}}`);
+    {{[Back to Edit ${npcName} Message](!proximitynpc -M ${safeNPCName} messages edit ${msgIndex})}}`);
         return;
     }
     if (action === 'set_cardstyle') {
@@ -628,7 +665,7 @@ function handleEditMessages(msg) {
             return;
         }
         monitoredNPC.messages[msgIndex].cardStyle = style.name;
-        sendChat("NPC Monitor", `/w ${who} Message card style set to ${style.name}.`);
+        sendChat("NPC Monitor", `/w ${who} ${npcName} Message ${msgIndex + 1} card style set to ${style.name}.`);
         // Return to the message edit screen
         handleEditMessages({ content: `!proximitynpc -M ${safeNPCName} messages edit ${msgIndex}`, who: who });
         return;
@@ -1181,9 +1218,9 @@ function triggerNPCMessage(npc, playerName="Guild Member") {
         cardStyle = state.ProximityNPC.cardStyles.find(style => style.name === selectedMessage.cardStyle);
     }
 
-    // Build styled card
+    // Build styled card - only show image if it exists
     let card = `<div style="background: ${cardStyle.backgroundColor || defaultCardStyle.backgroundColor}; border: 3px solid ${cardStyle.borderColor || defaultCardStyle.borderColor}; border-radius: 10px; padding: 15px; margin: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">` +
-        (npc.img ? `<div style="text-align: center; margin-bottom: 10px;">` +
+        (npc.img && npc.img.trim() !== '' ? `<div style="text-align: center; margin-bottom: 10px;">` +
             `<img src="` + npc.img + `" style="max-width: 200px; border: 4px solid ${cardStyle.borderColor || defaultCardStyle.borderColor}; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">` +
             `</div>` : ``) +
         `<div style="background: ${cardStyle.bubbleColor || defaultCardStyle.bubbleColor}; border: 2px solid ${cardStyle.borderColor || defaultCardStyle.borderColor}; border-radius: 8px; padding: 12px; position: relative;">` +
@@ -1224,7 +1261,7 @@ function autoMonitorNPCs() {
                 token.get('top') + (token.get('height') / 2),
                 { x: token.get('left'), y: token.get('top') },
                 presetNPC.timeout,
-                presetNPC.img,
+                getBestTokenImage(token), // Use fallback system instead of preset image
                 presetNPC.messages,
                 presetNPC.cardStyle || 'Default',
             );
