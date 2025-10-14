@@ -1005,7 +1005,7 @@ function handleEditCardStyle(msg) {
         return;
     }
 
-    let styleName = args[2].replace("_", " ").trim();
+    let styleName = fromSafeName(args[2]);
     let cardStyle = state.ProximityNPC.cardStyles.find(style => style.name.toLowerCase() === styleName.toLowerCase());
 
     if (!cardStyle) {
@@ -1236,9 +1236,7 @@ function handleEditMonitoredNPC(msg) {
 
 
     let value = args.slice(4).join(" ").trim();
-    let tokenCount = npc.tokenIds ? npc.tokenIds.length : 0;
-    let tokenInfo = tokenCount > 0 ? ` (Applied to ${tokenCount} token${tokenCount !== 1 ? 's' : ''})` : '';
-
+    
     switch (property) {
         case 'triggerdistance':
             let dist = parseFloat(value);
@@ -1247,7 +1245,7 @@ function handleEditMonitoredNPC(msg) {
                 npc.triggerDistance = state.ProximityNPC.defaultDistance || 2;
             } else {
                 npc.triggerDistance = dist;
-                sendChat("NPC Monitor", `/w ${who} ${npc.name} trigger distance set to ${dist}${tokenInfo}.`);
+                sendChat("NPC Monitor", `/w ${who} ${npc.name} trigger distance set to ${dist}.`);
             }
             break;
         case 'timeout':
@@ -1257,12 +1255,12 @@ function handleEditMonitoredNPC(msg) {
                 npc.timeout = state.ProximityNPC.defaultTimeout || 10000;
             } else {
                 npc.timeout = to;
-                sendChat("NPC Monitor", `/w ${who} ${npc.name} timeout set to ${to}ms${tokenInfo}.`);
+                sendChat("NPC Monitor", `/w ${who} ${npc.name} timeout set to ${to}ms.`);
             }
             break;
         case 'img':
             npc.img = value;
-            sendChat("NPC Monitor", `/w ${who} ${npc.name} image URL updated${tokenInfo}.`);
+            sendChat("NPC Monitor", `/w ${who} ${npc.name} image URL updated.`);
             break;
         case 'cardstyle':
             let style = state.ProximityNPC.cardStyles.find(s => s.name.toLowerCase() === value.toLowerCase());
@@ -1270,7 +1268,7 @@ function handleEditMonitoredNPC(msg) {
                 sendChat("NPC Monitor", `/w ${who} Card style "${value}" not found. Use --cardstyles to list available styles.`);
             } else {
                 npc.cardStyle = style.name;
-                sendChat("NPC Monitor", `/w ${who} ${npc.name} style set to ${style.name}${tokenInfo}.`);
+                sendChat("NPC Monitor", `/w ${who} ${npc.name} style set to ${style.name}.`);
             }
             break;
         case 'mode':
@@ -1280,7 +1278,7 @@ function handleEditMonitoredNPC(msg) {
                 npc.mode = 'on';
             } else {
                 npc.mode = mode;
-                sendChat("NPC Monitor", `/w ${who} ${npc.name} mode set to ${npc.mode}${tokenInfo}.`);
+                sendChat("NPC Monitor", `/w ${who} ${npc.name} mode set to ${npc.mode}.`);
             }
             break;
         default:
