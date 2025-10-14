@@ -103,7 +103,7 @@ state.ProximityNPC = {
             3,
             [
                 new MessageObject('The Guild Master looks up, you see a look of intense thought clear from his eyes. "Ah {playerName}, I hope you\'re keeping your wits sharp; I\'ve got some jobs coming up for you."', 3),
-                new MessageObject('Tharos nods at you, "Good to see you again, {playerName}. Remember, the guild is always here if you need assistance."', 3, 'Warm'),
+                new MessageObject('Tharos nods at you, "Good to see you again, {playerName}. Remember, the guild is always here if you need assistance."', 3),
                 new MessageObject('"Tempus favors the bold, {playerName}, but he also favors the prepared. Make sure you\'re both before heading out." He taps Ruinbreaker\'s haft thoughtfully.', 2),
                 new MessageObject('His booming laugh echoes through the hall. "That reminds me of the time I faced that wyvern! Though you didn\'t hear it from me..."', 1),
                 // Relationship messages
@@ -112,7 +112,7 @@ state.ProximityNPC = {
                 new MessageObject('"Ilikan may be our groundskeeper, but he has the patience of the giants who raised him. The guild wouldn\'t be standing without his careful maintenance."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/TharosRaggenthraw.png',
-            'GuildMaster'
+            'MithralRank'
         ),
         new PresetNPC(
             'Kinris Morranfew',
@@ -127,7 +127,8 @@ state.ProximityNPC = {
                 new MessageObject('"Bolagor and I have an arrangement - my best ale for his spiciest stew. The resulting feast nearly brought Tharos to tears last Winter\'s Crest."', 2),
                 new MessageObject('"Snek once tried to help me serve drinks. We lost three mugs and gained a wonderful story. That kobold means well, even when he\'s a disaster."', 1)
             ],
-            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/KinrisMorranfew.png'
+            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/KinrisMorranfew.png',
+            'CoalRank'
         ),
         new PresetNPC(
             'Ovlan Kalek',
@@ -142,7 +143,8 @@ state.ProximityNPC = {
                 new MessageObject('"Jade and I compiled the guild archives together. Her memory for detail is... unsettlingly good. Former spies make excellent librarians."', 2),
                 new MessageObject('"Fiona once helped me track a fey-touched beast for my research. Her connection to both drake and fey wilds made the difference between success and disaster."', 1)
             ],
-            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/OvlanKalek.png'
+            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/OvlanKalek.png',
+            'SilverRank'
         ),
         new PresetNPC(
             'Varon Tavis',
@@ -157,7 +159,8 @@ state.ProximityNPC = {
                 new MessageObject('"Risha\'s \'improvements\' to my tools usually work, eventually. The exploding tongs were... educational." He rubs a faint scar on his arm.', 2),
                 new MessageObject('"Ilikan understands materials - wood, stone, metal. We repaired the main gate together after that ogre incident. Good worker."', 1)
             ],
-            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/VaronTavis.png'
+            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/VaronTavis.png',
+            'CoalRank'
         ),
         new PresetNPC(
             'Caelum Riversong',
@@ -172,7 +175,8 @@ state.ProximityNPC = {
                 new MessageObject('"Kinris supplies me with the strongest spirits for disinfecting wounds. Her brew stings worse than any monster\'s bite, but it works."', 2),
                 new MessageObject('"I treated Fiona\'s drake when it ate something it shouldn\'t have. Remarkable creature - even its digestive troubles were impressive."', 1)
             ],
-            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/CaelumRiversong.png'
+            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/CaelumRiversong.png',
+            'CoalRank'
         ),
         new PresetNPC(
             'Risha Swiftdancer',
@@ -187,7 +191,8 @@ state.ProximityNPC = {
                 new MessageObject('"Varon grumbles about my \'tinkering\' but he\'s the first to test my new designs. We built a self-sharpening whetstone that actually works... mostly."', 2),
                 new MessageObject('"Snek brings me the most interesting scrap metal he finds. Half of it\'s junk, but that other half... pure inspiration."', 1)
             ],
-            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/RishaSwiftdancer.png'
+            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/RishaSwiftdancer.png',
+            'CoalRank'
         ),
         new PresetNPC(
             'Lumen Silverflock',
@@ -202,7 +207,8 @@ state.ProximityNPC = {
                 new MessageObject('"Kinris lets me help in the kitchen sometimes. She says I remind her of... well, she gets quiet after that. But she\'s always kind."', 2),
                 new MessageObject('"The guild party that rescued me... I don\'t remember all their names, but Tharos was there. His mane was the first thing I saw in the ruins."', 1)
             ],
-            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/LemunSilverflock.png'
+            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/LemunSilverflock.png',
+            'CopperRank'
         ),
         new PresetNPC(
             'Bolagor Bonejaw',
@@ -217,7 +223,8 @@ state.ProximityNPC = {
                 new MessageObject('"Kinris and I have a standing bet on who can create the more... memorable beverage. Last time, her ale made a dwarf cry. I respect that."', 2),
                 new MessageObject('"Little Auren is the only one who remembers every ingredient in my seven-pepper stew. Sharp mind, that one."', 1)
             ],
-            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/BolagorBonejaw.png'
+            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/BolagorBonejaw.png',
+            'CoalRank'
         ),
         new PresetNPC(
             'Jade Clearrock',
@@ -227,12 +234,14 @@ state.ProximityNPC = {
                 new MessageObject('"Tymora smiles on the prepared, {playerName}. What kind of quests would you like me to look out for?"', 2),
                 new MessageObject('"Looking for advice on certain aspects of adventuring, {playerName}?" You can almost sense the usefulness this conversation could have.', 2),
                 new MessageObject('"Diplomacy first, blades if necessary. That was my motto in the field, and it serves well here too."', 1),
+                new MessageObject('She looks up at you from the papers she\'s going over meticulously, "Keep striving to rank up, and build your reputation here, you\'re one of the best to write about."', 1),
                 // Relationship messages
                 new MessageObject('"Ovlan and I compiled the guild archives together. His memory for arcane lore is matched only by mine for... well, let\'s call it professional details."', 2),
                 new MessageObject('"Bolagor drives the hardest bargain I\'ve seen since my espionage days. I rather enjoy our negotiations - it keeps me sharp."', 2),
                 new MessageObject('"Who comes to me for stories of my adventuring days. She says they make good songs. I suppose everyone deserves a legend, even former spies."', 1)
             ],
-            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/JadeClearrock.png'
+            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/JadeClearrock.png',
+            'IronRank'
         ),
         new PresetNPC(
             'Fiona Wildfist',
@@ -247,7 +256,8 @@ state.ProximityNPC = {
                 new MessageObject('"Auren gets his curiosity from me, but his patience from his father. Between us, we\'re raising quite the remarkable young man."', 2),
                 new MessageObject('"Snek helps me with the smaller creatures. They trust him in a way they don\'t trust most people. There\'s a pure heart beneath that chatter."', 1)
             ],
-            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/FionaMirage.png'
+            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/FionaMirage.png',
+            'GoldRank'
         ),
         new PresetNPC(
             'Ilikan Wildfist',
@@ -262,7 +272,8 @@ state.ProximityNPC = {
                 new MessageObject('"Caelum and I share dawn prayers to Lathander. He tends to souls while I tend to the earth, but we both serve renewal in our ways."', 2),
                 new MessageObject('"I teach Auren Giant not just for language, but for perspective. The world looks different when you understand how giants think."', 1)
             ],
-            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/IlikanWildfist.png'
+            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/IlikanWildfist.png',
+            'CoalRank'
         ),
         new PresetNPC(
             'Auren Wildfist',
@@ -277,7 +288,8 @@ state.ProximityNPC = {
                 new MessageObject('"Master Ovlan says I\'m his best student, but I think he says that to all his apprentices. Still, it makes me want to work harder."', 2),
                 new MessageObject('"Father says our family follows Lathander because every morning is a new beginning. I like that - it means I can always try again tomorrow."', 1)
             ],
-            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/AurenWildfist.png'
+            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/AurenWildfist.png',
+            'CoalRank'
         ),
         new PresetNPC(
             'Keoti Fang',
@@ -292,7 +304,8 @@ state.ProximityNPC = {
                 new MessageObject('"Tharos and I served in different companies during the war, but we shared the same nightmares. Only difference is, he built a guild while I found a god."', 2),
                 new MessageObject('"I patrol with Fiona\'s drake sometimes. The creature sees things even I miss. Useful partner, if you don\'t mind the shedding."', 1)
             ],
-            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/KeotiFang.png'
+            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/KeotiFang.png',
+            'CoalRank'
         ),
         new PresetNPC(
             'Snek Littlefoot',
@@ -307,7 +320,8 @@ state.ProximityNPC = {
                 new MessageObject('"Who sings the prettiest songs! I try to remember the words but they get mixed up. She says it\'s the feeling that matters anyway."', 2),
                 new MessageObject('"Kinris is my favorite! She gives me the leftover fruit from her brewing and never gets mad when I spill things. Well, not TOO mad."', 1)
             ],
-            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/SnekLittlefoot.png'
+            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/SnekLittlefoot.png',
+            'CopperRank'
         ),
         new PresetNPC(
             'Who Wingfall',
@@ -322,7 +336,8 @@ state.ProximityNPC = {
                 new MessageObject('"Auren and I practice serving together. For a nine-year-old, he has remarkable rhythm. I think he\'d make a fine bard if wizardry doesn\'t work out."', 2),
                 new MessageObject('"Tharos took a chance on a street performer, and now I have a home. I write songs about his wyvern fight, but I make the ending happier than it really was."', 1)
             ],
-            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/WhoWingfall.png'
+            'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/WhoWingfall.png',
+            'CoalRank'
         )
     ],
     monitoredNPCs: {},
