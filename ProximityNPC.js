@@ -327,10 +327,16 @@ state.ProximityNPC = {
     ],
     monitoredNPCs: {},
     cardStyles: [
-        new CardStyle('Default'),
-        new CardStyle('Warm', '#d2691e', '#fff0e0', '#ffffff', '#4b2e1e'),
-        new CardStyle('GuildMaster', '#4b0082', '#e6e0f8', '#ffffff', '#2c1a4b'),
-    ]
+    new CardStyle('Default'),
+    new CardStyle('CoalRank', '#2b2b2b', '#3a3a3a', '#555555', '#e0e0e0'),
+    new CardStyle('CopperRank', '#b87333', '#ffe5b4', '#fff2e0', '#4a2c00'),
+    new CardStyle('IronRank', '#5a5a5a', '#d8d8d8', '#f5f5f5', '#1e1e1e'),
+    new CardStyle('SilverRank', '#c0c0c0', '#f8f8f8', '#ffffff', '#303030'),
+    new CardStyle('GoldRank', '#ffd700', '#fff8dc', '#fffaf0', '#5a4300'),
+    new CardStyle('PlatinumRank', '#e5e4e2', '#fefefe', '#ffffff', '#222222'),
+    new CardStyle('MithralRank', '#7fd4ff', '#e6f7ff', '#f0fbff', '#00334d')
+]
+
 }
 
 // Track which tokens have already triggered to avoid spam

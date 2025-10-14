@@ -1,0 +1,31 @@
+{
+  "name": "roll20-proximity-trigger",
+  "version": "2.1.0",
+  "type": "module",
+  "description": "Roll20 API script for proximity-based triggers (NPCs, traps, environment, passive checks, etc.) with modular TypeScript architecture",
+  "main": "dist/ProximityTrigger.js",
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -c -w",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "roll20",
+    "api",
+    "proximity",
+    "trigger",
+    "automation",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "rollup": "^4.0.0",
+    "tslib": "^2.6.2",
+    "typescript": "^5.3.3"
+  }
+}
