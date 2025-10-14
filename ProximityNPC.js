@@ -13,14 +13,16 @@ class CardStyle {
      * @param {string} bubbleColor - Speech bubble color
      * @param {string} textColor - Text color
      * @param {string} whisper - Whisper to 'character', 'gm', 'off'
+     * @param {string} badge - Optional url to badge image
      */
-    constructor(name, borderColor = '#8b4513', backgroundColor = '#f4e8d8', bubbleColor = '#ffffff', textColor = '#2c1810', whisper = 'off') {
+    constructor(name, borderColor = '#8b4513', backgroundColor = '#f4e8d8', bubbleColor = '#ffffff', textColor = '#2c1810', whisper = 'off', badge=null) {
         this.name = name;
         this.borderColor = borderColor;
         this.backgroundColor = backgroundColor;
         this.bubbleColor = bubbleColor;
         this.textColor = textColor;
         this.whisper = whisper;
+        this.badge = badge;
     }
 }
 
@@ -112,7 +114,7 @@ state.ProximityNPC = {
                 new MessageObject('"Ilikan may be our groundskeeper, but he has the patience of the giants who raised him. The guild wouldn\'t be standing without his careful maintenance."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/TharosRaggenthraw.png',
-            'MithralRank'
+            'Mithral Rank'
         ),
         new PresetNPC(
             'Kinris Morranfew',
@@ -128,7 +130,7 @@ state.ProximityNPC = {
                 new MessageObject('"Snek once tried to help me serve drinks. We lost three mugs and gained a wonderful story. That kobold means well, even when he\'s a disaster."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/KinrisMorranfew.png',
-            'CoalRank'
+            'Coal Rank'
         ),
         new PresetNPC(
             'Ovlan Kalek',
@@ -144,7 +146,7 @@ state.ProximityNPC = {
                 new MessageObject('"Fiona once helped me track a fey-touched beast for my research. Her connection to both drake and fey wilds made the difference between success and disaster."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/OvlanKalek.png',
-            'SilverRank'
+            'Silver Rank'
         ),
         new PresetNPC(
             'Varon Tavis',
@@ -160,7 +162,7 @@ state.ProximityNPC = {
                 new MessageObject('"Ilikan understands materials - wood, stone, metal. We repaired the main gate together after that ogre incident. Good worker."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/VaronTavis.png',
-            'CoalRank'
+            'Coal Rank'
         ),
         new PresetNPC(
             'Caelum Riversong',
@@ -176,7 +178,7 @@ state.ProximityNPC = {
                 new MessageObject('"I treated Fiona\'s drake when it ate something it shouldn\'t have. Remarkable creature - even its digestive troubles were impressive."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/CaelumRiversong.png',
-            'CoalRank'
+            'Coal Rank'
         ),
         new PresetNPC(
             'Risha Swiftdancer',
@@ -192,7 +194,7 @@ state.ProximityNPC = {
                 new MessageObject('"Snek brings me the most interesting scrap metal he finds. Half of it\'s junk, but that other half... pure inspiration."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/RishaSwiftdancer.png',
-            'CoalRank'
+            'Coal Rank'
         ),
         new PresetNPC(
             'Lumen Silverflock',
@@ -208,7 +210,7 @@ state.ProximityNPC = {
                 new MessageObject('"The guild party that rescued me... I don\'t remember all their names, but Tharos was there. His mane was the first thing I saw in the ruins."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/LemunSilverflock.png',
-            'CopperRank'
+            'Copper Rank'
         ),
         new PresetNPC(
             'Bolagor Bonejaw',
@@ -224,7 +226,7 @@ state.ProximityNPC = {
                 new MessageObject('"Little Auren is the only one who remembers every ingredient in my seven-pepper stew. Sharp mind, that one."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/BolagorBonejaw.png',
-            'CoalRank'
+            'Coal Rank'
         ),
         new PresetNPC(
             'Jade Clearrock',
@@ -241,7 +243,7 @@ state.ProximityNPC = {
                 new MessageObject('"Who comes to me for stories of my adventuring days. She says they make good songs. I suppose everyone deserves a legend, even former spies."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/JadeClearrock.png',
-            'IronRank'
+            'Iron Rank'
         ),
         new PresetNPC(
             'Fiona Wildfist',
@@ -257,7 +259,7 @@ state.ProximityNPC = {
                 new MessageObject('"Snek helps me with the smaller creatures. They trust him in a way they don\'t trust most people. There\'s a pure heart beneath that chatter."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/FionaMirage.png',
-            'GoldRank'
+            'Gold Rank'
         ),
         new PresetNPC(
             'Ilikan Wildfist',
@@ -273,7 +275,7 @@ state.ProximityNPC = {
                 new MessageObject('"I teach Auren Giant not just for language, but for perspective. The world looks different when you understand how giants think."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/IlikanWildfist.png',
-            'CoalRank'
+            'Coal Rank'
         ),
         new PresetNPC(
             'Auren Wildfist',
@@ -289,7 +291,7 @@ state.ProximityNPC = {
                 new MessageObject('"Father says our family follows Lathander because every morning is a new beginning. I like that - it means I can always try again tomorrow."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/AurenWildfist.png',
-            'CoalRank'
+            'Coal Rank'
         ),
         new PresetNPC(
             'Keoti Fang',
@@ -305,7 +307,7 @@ state.ProximityNPC = {
                 new MessageObject('"I patrol with Fiona\'s drake sometimes. The creature sees things even I miss. Useful partner, if you don\'t mind the shedding."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/KeotiFang.png',
-            'CoalRank'
+            'Coal Rank'
         ),
         new PresetNPC(
             'Snek Littlefoot',
@@ -321,7 +323,7 @@ state.ProximityNPC = {
                 new MessageObject('"Kinris is my favorite! She gives me the leftover fruit from her brewing and never gets mad when I spill things. Well, not TOO mad."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/SnekLittlefoot.png',
-            'CopperRank'
+            'Copper Rank'
         ),
         new PresetNPC(
             'Who Wingfall',
@@ -337,19 +339,19 @@ state.ProximityNPC = {
                 new MessageObject('"Tharos took a chance on a street performer, and now I have a home. I write songs about his wyvern fight, but I make the ending happier than it really was."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/WhoWingfall.png',
-            'CoalRank'
+            'Coal Rank'
         )
     ],
     monitoredNPCs: {},
     cardStyles: [
     new CardStyle('Default'),
-    new CardStyle('CoalRank', '#2b2b2b', '#3a3a3a', '#555555', '#e0e0e0'),
-    new CardStyle('CopperRank', '#b87333', '#ffe5b4', '#fff2e0', '#4a2c00'),
-    new CardStyle('IronRank', '#5a5a5a', '#d8d8d8', '#f5f5f5', '#1e1e1e'),
-    new CardStyle('SilverRank', '#c0c0c0', '#f8f8f8', '#ffffff', '#303030'),
-    new CardStyle('GoldRank', '#ffd700', '#fff8dc', '#fffaf0', '#5a4300'),
-    new CardStyle('PlatinumRank', '#e5e4e2', '#fefefe', '#ffffff', '#222222'),
-    new CardStyle('MithralRank', '#7fd4ff', '#e6f7ff', '#f0fbff', '#00334d')
+    new CardStyle('Coal Rank', '#2b2b2b', '#3a3a3a', '#555555', '#e0e0e0', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/coal_rank.png'),
+    new CardStyle('Copper Rank', '#b87333', '#ffe5b4', '#fff2e0', '#4a2c00', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/copper_rank.png'),
+    new CardStyle('Iron Rank', '#5a5a5a', '#d8d8d8', '#f5f5f5', '#1e1e1e', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/iron_rank.png'),
+    new CardStyle('Silver Rank', '#c0c0c0', '#f8f8f8', '#ffffff', '#303030', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/silver_rank.png'),
+    new CardStyle('Gold Rank', '#ffd700', '#fff8dc', '#fffaf0', '#5a4300', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/gold_rank.png'),
+    new CardStyle('Platinum Rank', '#e5e4e2', '#fefefe', '#ffffff', '#222222', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/platinum_rank.png'),
+    new CardStyle('Mithral Rank', '#7fd4ff', '#e6f7ff', '#f0fbff', '#00334d', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/mithral_rank.png')
 ]
 
 }
@@ -1048,11 +1050,12 @@ function handleEditCardStyle(msg) {
             { name: 'Background Color', type: 'color', attr: 'backgroundColor', value: cardStyle.backgroundColor },
             { name: 'Bubble Color', type: 'color', attr: 'bubbleColor', value: cardStyle.bubbleColor },
             { name: 'Text Color', type: 'color', attr: 'textColor', value: cardStyle.textColor },
-            { name: 'Whisper', type: 'whisper', attr: 'whisper', value: cardStyle.whisper }
+            { name: 'Whisper', type: 'whisper', attr: 'whisper', value: cardStyle.whisper },
+            { name: 'Badge', type: 'url', attr: 'badge', value: cardStyle.badge }
         ];
 
         let propertyLinks = properties.map(prop =>
-            `{{[${prop.name}: ${prop.value}](!proximitynpc -C ${toSafeName(cardStyle.name)} ${prop.attr})}}`
+            `{{[${prop.name}: ${prop.attr == 'badge' ? (prop.value || 'None').slice(0, 16) : (prop.value || 'None')}](!proximitynpc -C ${toSafeName(cardStyle.name)} ${prop.attr})}}`
         ).join(" ");
 
         sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Edit Card Style: ${cardStyle.name}}} ${propertyLinks} {{[Delete Style](!proximitynpc -C delete ${toSafeName(cardStyle.name)})}}`);
@@ -1088,12 +1091,15 @@ function handleEditCardStyle(msg) {
             case 'whisper':
                 promptMessage = "Enter whisper mode ^'character', 'gm', or 'off'^:";
                 break;
+            case 'badge':
+                promptMessage = "Enter URL for Badge Image ^'clear' to remove^:"
+                break;
             default:
                 sendChat("NPC Monitor", `/w ${who} Unknown property: ${property}. Valid properties: borderColor, backgroundColor, bubbleColor, textColor, whisper`);
                 return;
         }
 
-        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set ${property} for ${cardStyle.name}}} {{Current: ${currentValue}}} {{${promptMessage}=[Click Here](!proximitynpc -C ${toSafeName(cardStyle.name)} ${property} ?{${promptMessage}|${currentValue}})}}`);
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set ${property} for ${cardStyle.name}}} {{Current: ${property == 'badge' ? (currentValue ? currentValue.slice(0, 30) : 'None') : (currentValue || '')}}} {{${promptMessage}=[Click Here](!proximitynpc -C ${toSafeName(cardStyle.name)} ${property} ?{${promptMessage}|${currentValue}})}}`);
         return;
     }
 
@@ -1127,6 +1133,11 @@ function handleEditCardStyle(msg) {
                 cardStyle.whisper = 'off';
                 sendChat("NPC Monitor", `/w ${who} Invalid whisper value "${value}". Set to "off". Valid values: 'character', 'gm', 'off'`);
             }
+            break;
+        case 'badge':
+            let clear = value.toLowerCase().trim() == 'clear';
+            cardStyle.badge = clear ? null : value;
+            sendChat("NPC Monitor", `/w ${who} ${clear ? 'Removed' : 'Updated'} ${cardStyle.name} badge url to ${clear ? '' : `"${value}"`}`);
             break;
         default:
             sendChat("NPC Monitor", `/w ${who} Unknown property: ${property}. Valid properties: borderColor, backgroundColor, bubbleColor, textColor, whisper`);
@@ -1562,8 +1573,8 @@ function triggerNPCMessage(npc, playerName = "Guild Member") {
             `</div>` : ``) +
         `<div style="background: ${cardStyle.bubbleColor || defaultCardStyle.bubbleColor}; border: 2px solid ${cardStyle.borderColor || defaultCardStyle.borderColor}; border-radius: 8px; padding: 12px; position: relative;">` +
         `<div style="position: absolute; top: -10px; left: 20px; width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 10px solid ${cardStyle.borderColor || defaultCardStyle.borderColor};"></div>` +
-        `<div style="position: absolute; top: -7px; left: 21px; width: 0; height: 0; border-left: 9px solid transparent; border-right: 9px solid transparent; border-bottom: 9px solid white;"></div>` +
-        `<p style="margin: 0; color: ${cardStyle.textColor || defaultCardStyle.textColor}; font-size: 14px; line-height: 1.6;"><strong>` + npc.name + `:</strong></p>` +
+        `<div style="position: absolute; top: -7px; left: 21px; width: 0; height: 0; border-left: 9px solid transparent; border-right: 9px solid transparent; border-bottom: 9px solid ${cardStyle.bubbleColor};"></div>` +
+        `<p style="margin: 0; color: ${cardStyle.textColor || defaultCardStyle.textColor}; font-size: 14px; line-height: 1.6; align-items: center;">${cardStyle.badge ? `<img src="` + cardStyle.badge + `" style="height: 20px; width: 20px; border: 3px solid ${cardStyle.borderColor || defaultCardStyle.borderColor}; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"> ` : ''}<strong>` + npc.name + `:</strong></p>` +
         `<p style="margin: 8px 0 0 0; color: ${cardStyle.textColor || defaultCardStyle.textColor}; font-size: 14px; line-height: 1.6; font-style: italic;">` + personalizedMessage + `</p>` +
         `</div>` +
         `</div>`;
@@ -1593,7 +1604,6 @@ function autoMonitorNPCs() {
                 let monitoredNPC = state.ProximityNPC.monitoredNPCs[safeName];
                 if (!monitoredNPC.tokenIds.includes(token.id)) {
                     monitoredNPC.tokenIds.push(token.id);
-                    log(`Added token ${token.id} to existing monitored NPC ${tokenName}`);
                 }
             } else {
                 // Create new monitored NPC with this token
@@ -1607,7 +1617,6 @@ function autoMonitorNPCs() {
                     presetNPC.cardStyle || 'Default',
                     'on'
                 );
-                log(`Auto-monitored new NPC ${tokenName} with token ${token.id}`);
             }
         }
     });

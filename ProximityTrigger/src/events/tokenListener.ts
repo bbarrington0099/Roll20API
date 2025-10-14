@@ -38,7 +38,6 @@ export function setupTokenListeners(state: ProximityTriggerState): void {
             // Add this token ID to the monitored trigger if not already there
             if (!monitoredNPC.tokenIds.includes(token.id)) {
                 monitoredNPC.tokenIds.push(token.id);
-                log(`Added token ${token.id} to monitored trigger ${tokenName}`);
             }
         }
     });
@@ -58,7 +57,6 @@ export function setupTokenListeners(state: ProximityTriggerState): void {
             const index = monitoredNPC.tokenIds.indexOf(token.id);
             if (index > -1) {
                 monitoredNPC.tokenIds.splice(index, 1);
-                log(`Removed token ${token.id} from monitored NPC ${tokenName}`);
 
                 // Clear any triggered tokens for this token
                 Object.keys(triggeredTokens).forEach(key => {

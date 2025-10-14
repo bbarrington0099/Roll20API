@@ -79,31 +79,33 @@ function buildMessageCard(
     const bgColor = cardStyle.backgroundColor || defaultStyle.backgroundColor;
     const bubbleColor = cardStyle.bubbleColor || defaultStyle.bubbleColor;
     const textColor = cardStyle.textColor || defaultStyle.textColor;
+    const badgeUrl = cardStyle.badge || defaultStyle.badge;
+    const nameForClass = npc.name.trim().split(" ")[0] + "-" || "";
 
-    let html = `<div style="background: ${bgColor}; border: 3px solid ${borderColor}; ` +
+    let html = `<div class="${nameForClass}card" style="background: ${bgColor}; border: 3px solid ${borderColor}; ` +
         `border-radius: 10px; padding: 15px; margin: 10px; ` +
         `box-shadow: 0 4px 8px rgba(0,0,0,0.3);">`;
 
     // Add image if available
     if (npc.img && npc.img.trim() !== '') {
-        html += `<div style="text-align: center; margin-bottom: 10px;">` +
-            `<img src="${npc.img}" style="max-width: 200px; border: 4px solid ${borderColor}; ` +
+        html += `<div class="${nameForClass}card-image-container" style="text-align: center; margin-bottom: 10px;">` +
+            `<img class="${nameForClass}card-image" src="${npc.img}" style="max-width: 200px; border: 4px solid ${borderColor}; ` +
             `border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">` +
             `</div>`;
     }
 
-    // Add speech bubble
-    html += `<div style="background: ${bubbleColor}; border: 2px solid ${borderColor}; ` +
+    // Add dialog bubble
+    html += `<div class="${nameForClass}card-dialog-bubble-container" style="background: ${bubbleColor}; border: 2px solid ${borderColor}; ` +
         `border-radius: 8px; padding: 12px; position: relative;">` +
-        `<div style="position: absolute; top: -10px; left: 20px; width: 0; height: 0; ` +
+        `<div class="${nameForClass}card-dialog-bubble-arrow-border" style="position: absolute; top: -10px; left: 20px; width: 0; height: 0; ` +
         `border-left: 10px solid transparent; border-right: 10px solid transparent; ` +
         `border-bottom: 10px solid ${borderColor};"></div>` +
-        `<div style="position: absolute; top: -7px; left: 21px; width: 0; height: 0; ` +
+        `<div class="${nameForClass}card-dialog-bubble-arrow" style="position: absolute; top: -7px; left: 21px; width: 0; height: 0; ` +
         `border-left: 9px solid transparent; border-right: 9px solid transparent; ` +
-        `border-bottom: 9px solid white;"></div>` +
-        `<p style="margin: 0; color: ${textColor}; font-size: 14px; line-height: 1.6;">` +
+        `border-bottom: 9px solid ${bubbleColor};"></div>` +
+        `<p class="${nameForClass}card-dialog-bubble-speaker" style="margin: 0; color: ${textColor}; font-size: 14px; line-height: 1.6; align-items: center;">${badgeUrl ? `<img src="` + badgeUrl + `" style="height: 20px; width: 20px; border: 3px solid ${borderColor}; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"> ` : ''}">` +
         `<strong>${npc.name}:</strong></p>` +
-        `<p style="margin: 8px 0 0 0; color: ${textColor}; font-size: 14px; ` +
+        `<p class="${nameForClass}card-dialog-bubble-content" style="margin: 8px 0 0 0; color: ${textColor}; font-size: 14px; ` +
         `line-height: 1.6; font-style: italic;">${messageContent}</p>` +
         `</div></div>`;
 

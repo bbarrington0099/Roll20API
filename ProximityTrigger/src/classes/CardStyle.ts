@@ -12,6 +12,7 @@ export class CardStyle {
     public bubbleColor: string;
     public textColor: string;
     public whisper: 'off' | 'character' | 'gm';
+    public badge: string | null;
 
     /**
      * Creates a new CardStyle with customizable appearance.
@@ -22,6 +23,7 @@ export class CardStyle {
      * @param bubbleColor - Speech bubble interior color
      * @param textColor - Text color for readability
      * @param whisper - Whisper mode: 'character', 'gm', or 'off'
+     * @param badge - URL to the Style Badge (nullable)
      */
     constructor(
         name: string,
@@ -29,7 +31,8 @@ export class CardStyle {
         backgroundColor: string = '#f4e8d8',
         bubbleColor: string = '#ffffff',
         textColor: string = '#2c1810',
-        whisper: 'off' | 'character' | 'gm' = 'off'
+        whisper: 'off' | 'character' | 'gm' = 'off',
+        badge: string | null = null
     ) {
         this.name = name;
         this.borderColor = borderColor;
@@ -37,6 +40,7 @@ export class CardStyle {
         this.bubbleColor = bubbleColor;
         this.textColor = textColor;
         this.whisper = whisper;
+        this.badge = badge;
     }
 }
 

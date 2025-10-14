@@ -278,5 +278,6 @@ interface CardStyleData {
     bubbleColor: string;
     textColor: string;
     whisper: 'off' | 'character' | 'gm';
+    badge: string | null;
 }
 

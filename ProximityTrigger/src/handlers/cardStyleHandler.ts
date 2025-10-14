@@ -107,11 +107,12 @@ function showCardStyleEditDialog(
         { name: 'Background Color', attr: 'backgroundColor', value: cardStyle.backgroundColor },
         { name: 'Bubble Color', attr: 'bubbleColor', value: cardStyle.bubbleColor },
         { name: 'Text Color', attr: 'textColor', value: cardStyle.textColor },
-        { name: 'Whisper', attr: 'whisper', value: cardStyle.whisper }
+        { name: 'Whisper', attr: 'whisper', value: cardStyle.whisper },
+        { name: 'Badge', attr: 'badge', value: cardStyle.badge }
     ];
 
     const propertyLinks = properties.map(prop =>
-        `{{[${prop.name}: ${prop.value}](!pt -C ${toSafeName(cardStyle.name)} ${prop.attr})}}`
+        `{{[${prop.name}: ${prop.attr == 'badge' ? (prop.value || 'None').slice(0, 16) : (prop.value || 'None')}](!pt -C ${toSafeName(cardStyle.name)} ${prop.attr})}}`
     ).join(' ');
 
     sendChat('Proximity Trigger',
@@ -153,17 +154,20 @@ function showCardStylePropertyPrompt(
         case 'whisper':
             promptMessage = 'Enter whisper mode ^\'character\', \'gm\', or \'off\'^:';
             break;
+        case 'badge':
+            promptMessage = "Enter URL for Badge Image ^'clear' to remove^:"
+            break;
         default:
             sendChat('Proximity Trigger',
                 `/w ${who} Unknown property: ${property}. ` +
-                `Valid properties: borderColor, backgroundColor, bubbleColor, textColor, whisper`
+                `Valid properties: borderColor, backgroundColor, bubbleColor, textColor, whisper, badge`
             );
             return;
     }
 
     sendChat('Proximity Trigger',
         `/w ${who} &{template:default} {{name=Set ${property} for ${cardStyle.name}}} ` +
-        `{{Current: ${currentValue}}} ` +
+        `{{Current: ${property == 'badge' ? (currentValue ? currentValue.slice(0, 30) : 'None') : (currentValue || '')}}} ` +
         `{{${promptMessage}=[Click Here](!pt -C ${toSafeName(cardStyle.name)} ${property} ?{${promptMessage}|${currentValue}})}}`
     );
 }
@@ -223,10 +227,15 @@ function setCardStyleProperty(
                 );
             }
             break;
+        case 'badge':
+            let clear = value.toLowerCase().trim() == 'clear';
+            cardStyle.badge = clear ? null : value;
+            sendChat('Proximity Trigger', `/w ${who} ${clear ? 'Removed' : 'Updated'} ${cardStyle.name} badge url to ${clear ? '' : `"${value}"`}`);
+            break;
         default:
             sendChat('Proximity Trigger',
                 `/w ${who} Unknown property: ${property}. ` +
-                `Valid properties: borderColor, backgroundColor, bubbleColor, textColor, whisper`
+                `Valid properties: borderColor, backgroundColor, bubbleColor, textColor, whisper, badge`
             );
             return;
     }
