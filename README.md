@@ -158,6 +158,7 @@ new MessageObject(
 {2d20+3}        // Roll with modifier
 {1d8+2d6}       // Multiple dice
 {1d8+2d6+2}     // Complex expression
+{1d8 + playerName.hp}
 ```
 **Hover tooltip shows breakdown:** `1d8=[4]+2d6=[3,5]+2`
 

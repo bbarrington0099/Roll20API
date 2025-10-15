@@ -74,9 +74,12 @@ function showPropertyInputPrompt(
             const styleList = state.cardStyles.map(s =>
                 `{{[${s.name}](!pt -e ${safeName} cardStyle ${s.name})}}`
             ).join(' ');
+            const currStyle = npc.cardStyle || 'Default';
             sendChat('Proximity Trigger',
                 `/w ${who} &{template:default} ` +
-                `{{name=Select Card Style for ${npc.name}}} ${styleList}`
+                `{{name=Select Card Style for ${npc.name}}} ` +
+                `{{Current: ${currStyle}}}` +
+                `${styleList}`
             );
             break;
 
@@ -102,17 +105,20 @@ function showPropertyInputPrompt(
             const imgUrl = npc.img || 'https://raw.githubusercontent.com/bbarrington0099/Roll20API/main/ProximityTrigger/src/ProximityTrigger.png';
             sendChat('Proximity Trigger',
                 `/w ${who} &{template:default} {{name=Set Image URL for ${npc.name}}} ` +
-                `{{Current: [Link](${npc.img || 'none'})}} ` +
-                `{{New URL=[Click Here](!pt -e ${safeName} img ?{Enter new image URL|${imgUrl}})}}`
+                `{{Current: ${npc.img ? `[Link](${npc.img})` : `None`}}} ` +
+                `{{New URL=[Click Here](!pt -e ${safeName} img ?{Enter new image URL ^'clear' to remove^|${imgUrl}})}}`
             );
             break;
 
         case 'mode':
+            const modeList = ['on', 'off', 'once'].map(m =>
+                `{{[${m.toUpperCase()}](!proximitynpc -e ${toSafeName(npc.name)} mode ${m})}}`
+            ).join(" ");
             const currMode = npc.mode || 'on';
             sendChat('Proximity Trigger',
                 `/w ${who} &{template:default} {{name=Set Mode for ${npc.name}}} ` +
                 `{{Current: ${currMode}}} ` +
-                `{{New Mode=[Click Here](!pt -e ${safeName} mode ?{Enter new Mode ^on, off, once^|${currMode}})}}`
+                `${modeList}`
             );
             break;
 
@@ -175,9 +181,10 @@ function setNPCProperty(
             break;
 
         case 'img':
-            npc.img = value;
+            const clear = value.toLowerCase().trim() === 'clear';
+            npc.img = clear ? null : value;
             sendChat('Proximity Trigger',
-                `/w ${who} ${npc.name} image URL updated${tokenInfo}.`
+                `/w ${who} ${clear ? 'Removed' : 'Updated'} ${npc.name} image url${clear ? '' : ` to "${value}"`}${tokenInfo}.`
             );
             break;
 

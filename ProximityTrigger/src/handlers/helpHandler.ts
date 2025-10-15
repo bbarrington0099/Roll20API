@@ -25,7 +25,17 @@ export function handleHelp(msg: ChatMessage): void {
         `{{--cardstyles|-cl=List all card styles}} ` +
         `{{--cardstyle|-C [StyleName] [property] [value]=Edit or create a card style}} ` +
         `{{--delete|-D [Name]=Delete a monitored trigger}} ` +
-        `{{--help|-h=Show this help}}`
+        `{{--help|-h=Show this help}} ` +
+        `{{=**Dynamic Message Content**}} ` +
+        `{{**Dice Roll Syntax**=Supported dice notation:}} ` +
+        `{{Basic Rolls=1d6, 2d20, 3d8 (XdY format)}} ` +
+        `{{With Modifiers=1d20+5, 2d6+3, 1d8-2}} ` +
+        `{{Complex=1d20+1d4+3, (2d6+2)*2, 1d100/10}} ` +
+        `{{Limits=1-100 dice, 1-1000 sides per die}} ` +
+        `{{**Character Attributes**=Supported attribute names:}} ` +
+        `{{Core Stats=hp, maxhp, ac, level, gold/gp, inspiration}} ` +
+        `{{Abilities=str/dex/con/int/wis/cha (and modifiers)}} ` +
+        `{{Examples={playerName.hp}, {monitoredName.ac}, {playerName.gold}}}`
     );
 }
 

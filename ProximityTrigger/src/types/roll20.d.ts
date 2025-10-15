@@ -276,7 +276,7 @@ declare global {
         triggerDistance: number;
         tokenIds: string[];
         timeout: number;
-        img: string;
+        img: string | null;
         messages: MessageObjectData[];
         cardStyle: string;
         mode: 'on' | 'off' | 'once';

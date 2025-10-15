@@ -14,7 +14,7 @@ export class MonitoredNPC {
     public triggerDistance: number;
     public tokenIds: string[];
     public timeout: number;
-    public img: string;
+    public img: string | null;
     public messages: MessageObject[];
     public cardStyle: string;
     public mode: 'on' | 'off' | 'once';
@@ -26,7 +26,7 @@ export class MonitoredNPC {
      * @param triggerDistance - Trigger distance in token body widths
      * @param tokenIds - Array of Roll20 token IDs representing this trigger
      * @param timeout - Cooldown in ms before re-triggering (0 = permanent)
-     * @param img - Portrait/image URL
+     * @param img - Portrait/image URL (null to hide image)
      * @param messages - Array of possible messages
      * @param cardStyle - Card style name for this trigger
      * @param mode - Operating mode: 'on', 'off', or 'once'
@@ -36,7 +36,7 @@ export class MonitoredNPC {
         triggerDistance: number = 2,
         tokenIds: string[] = [],
         timeout: number = 10000,
-        img: string = 'https://raw.githubusercontent.com/bbarrington0099/Roll20API/main/ProximityTrigger/src/ProximityTrigger.png',
+        img: string | null = 'https://raw.githubusercontent.com/bbarrington0099/Roll20API/main/ProximityTrigger/src/ProximityTrigger.png',
         messages: MessageObject[] = [],
         cardStyle: string = 'Default',
         mode: 'on' | 'off' | 'once' = 'on'

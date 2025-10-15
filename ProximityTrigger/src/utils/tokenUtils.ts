@@ -15,7 +15,7 @@
  * @param state - The ProximityTrigger state object
  * @returns The best available image URL
  */
-export function getBestTokenImage(token: Graphic, state: ProximityTriggerState): string {
+export function getBestTokenImage(token: Graphic, state: ProximityTriggerState): string | null {
     // Check if token represents a character and get avatar
     const charId = token.get('represents');
     if (charId) {
@@ -39,8 +39,8 @@ export function getBestTokenImage(token: Graphic, state: ProximityTriggerState):
         return state.defaultImagePath;
     }
 
-    // Final fallback
-    return '';
+    // Final fallback - return null to indicate no image
+    return null;
 }
 
 /**

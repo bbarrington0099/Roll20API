@@ -705,7 +705,7 @@ function showEditMonitorNPCDialog(msg, token) {
  */
 function showHelpMessage(msg = { who: "gm" }) {
     let who = msg.who || "gm";
-    sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=NPC Proximity Monitor Help}} {{!proximitynpc=Main call (must include one flag)}} {{--monitor|-M [Token/Name]=Add or edit an NPC monitor (requires a token or name). Use underscores for spaces.}} {{--list|-l=List all monitored NPCs}} {{--menu|-m=Open the ProximityNPC menu}} {{--edit|-e [Name] [prop] [value]=Edit a monitored NPC's property (prop: triggerDistance, timeout, img, cardStyle)}} {{--trigger|-t [Token/Name]=Manually trigger an NPC message}} {{--attributes|-a [Token]=List all attributes for selected token/character}} {{--cardstyles|-cl=List all card styles}} {{--cardstyle|-C [StyleName] [property] [value]=Edit or create a card style}} {{--delete|-D [Name]=Delete a monitored NPC}} {{--help|-h=Show this help}} {{**Dynamic Message Content**=Messages support special syntax:}} {{{playerName}=Triggering character's first name}} {{{monitoredName}=NPC's name}} {{{playerName.hp}=Character attribute value}} {{{monitoredName.hp}=NPC's attribute value}} {{{1d6} or {2d20+3}=Dice rolls (styled)}} {{[Text](message)=Clickable button (can include rolls with [[1d6]], whispers, API calls)}}`);
+    sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=NPC Proximity Monitor Help}} {{!proximitynpc=Main call (must include one flag)}} {{--monitor|-M [Token/Name]=Add or edit an NPC monitor (requires a token or name). Use underscores for spaces.}} {{--list|-l=List all monitored NPCs}} {{--menu|-m=Open the ProximityNPC menu}} {{--edit|-e [Name] [prop] [value]=Edit a monitored NPC's property (prop: triggerDistance, timeout, img, cardStyle)}} {{--trigger|-t [Token/Name]=Manually trigger an NPC message}} {{--attributes|-a [Token]=List all attributes for selected token/character}} {{--cardstyles|-cl=List all card styles}} {{--cardstyle|-C [StyleName] [property] [value]=Edit or create a card style}} {{--delete|-D [Name]=Delete a monitored NPC}} {{--help|-h=Show this help}} {{=**Dynamic Message Content**}} {{{playerName}=Triggering character's first name}} {{{monitoredName}=NPC's name}} {{{playerName.hp}=Character attribute value}} {{{monitoredName.hp}=NPC's attribute value}} {{{1d6} or {2d20+3}=Dice rolls (styled)}} {{'sqr'Text'sqr'(message)=Clickable button (can include rolls with [[1d6]], whispers, API calls)}} {{**Dice Roll Syntax**=Supported dice notation:}} {{Basic Rolls=1d6, 2d20, 3d8 (XdY format)}} {{With Modifiers=1d20+5, 2d6+3, 1d8-2}} {{Complex=1d20+1d4+3, (2d6+2)*2, 1d100/10}} {{Limits=1-100 dice, 1-1000 sides per die}} {{**Character Attributes**=Supported attribute names:}} {{Core Stats=hp, maxhp, ac, level, gold/gp, inspiration}} {{Abilities=str/dex/con/int/wis/cha (and modifiers)}} {{Examples={playerName.hp}, {monitoredName.ac}, {playerName.gold}}}`);
 }
 
 /**
@@ -1081,7 +1081,7 @@ function handleEditCardStyle(msg) {
         ];
 
         let propertyLinks = properties.map(prop =>
-            `{{[${prop.name}: ${prop.attr == 'badge' ? (prop.value || 'None').slice(0, 16) : (prop.value || 'None')}](!proximitynpc -C ${toSafeName(cardStyle.name)} ${prop.attr})}}`
+            `{{[${prop.name}: ${prop.attr == 'badge' ? 'Image URL' : (prop.value || 'None')}](!proximitynpc -C ${toSafeName(cardStyle.name)} ${prop.attr})}}${prop.attr == 'badge' && prop.value ? ` {{[Link](${prop.value || 'None'})}}` : ''}`
         ).join(" ");
 
         sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Edit Card Style: ${cardStyle.name}}} ${propertyLinks} {{[Delete Style](!proximitynpc -C delete ${toSafeName(cardStyle.name)})}}`);
@@ -1115,8 +1115,15 @@ function handleEditCardStyle(msg) {
                 promptMessage = "Enter text color ^any CSS color^:";
                 break;
             case 'whisper':
-                promptMessage = "Enter whisper mode ^'character', 'gm', or 'off'^:";
-                break;
+                let whispers = ['off', 'gm', 'character'].map(w =>
+                    `{{[${w.toUpperCase()}](!proximitynpc -C ${toSafeName(cardStyle.name)} whisper ${w})}}`
+                ).join(" ");
+                sendChat('NPC Monitor',
+                    `/w ${who} &{template:default} {{name=Set Whisper for ${cardStyle.name}}} ` +
+                    `{{Current: ${currentValue}}} ` +
+                    `${whispers}`
+                );
+                return;
             case 'badge':
                 promptMessage = "Enter URL for Badge Image ^'clear' to remove^:"
                 break;
@@ -1125,7 +1132,7 @@ function handleEditCardStyle(msg) {
                 return;
         }
 
-        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set ${property} for ${cardStyle.name}}} {{Current: ${property == 'badge' ? (currentValue ? currentValue.slice(0, 30) : 'None') : (currentValue || '')}}} {{${promptMessage}=[Click Here](!proximitynpc -C ${toSafeName(cardStyle.name)} ${property} ?{${promptMessage}|${currentValue}})}}`);
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set ${property} for ${cardStyle.name}}} {{Current: ${property == 'badge' ? currentValue ? `[Link](${currentValue || 'None'})` : `None` : (currentValue || '')}}} {{${promptMessage}=[Click Here](!proximitynpc -C ${toSafeName(cardStyle.name)} ${property} ?{${promptMessage}|${currentValue}})}}`);
         return;
     }
 
@@ -1263,7 +1270,7 @@ function handleEditMonitoredNPC(msg) {
         let styleList = state.ProximityNPC.cardStyles.map(s =>
             `{{[${s.name}](!proximitynpc -e ${toSafeName(npc.name)} cardStyle ${s.name})}}`
         ).join(" ");
-        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Select Card Style for ${npc.name}}} ${styleList}`);
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Select Card Style for ${npc.name}}} {{Current: ${npc.cardStyle || 'Default'}}} ${styleList}`);
         return;
     }
 
@@ -1282,14 +1289,17 @@ function handleEditMonitoredNPC(msg) {
     if (property === 'img' && args.length < 5) {
         sendChat("NPC Monitor",
             `/w ${who} &{template:default} {{name=Set Image URL for ${npc.name}}} ` +
-            `{{Current: [Link](${npc.img || 'none'})}} ` +
-            `{{New URL=[Click Here](!proximitynpc -e ${toSafeName(npc.name)} img ?{Enter new image URL|${npc.img || 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/GuildEmblem.png'}})}}`
+            `{{Current: ${npc.img ? `[Link](${npc.img})` : `None`}}} ` +
+            `{{New URL=[Click Here](!proximitynpc -e ${toSafeName(npc.name)} img ?{Enter new image URL ^'clear' to remove^|${npc.img || 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/GuildEmblem.png'}})}}`
         );
         return;
     }
 
     if (property === 'mode' && args.length < 5) {
-        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set Mode for ${npc.name}}} {{Current: ${npc.mode || 'on'}}} {{New Mode=[Click Here](!proximitynpc -e ${toSafeName(npc.name)} mode ?{Enter new Mode ^on, off, once^|${npc.mode || 'on'}})}}`);
+        let modeList = ['on', 'off', 'once'].map(m =>
+            `{{[${m.toUpperCase()}](!proximitynpc -e ${toSafeName(npc.name)} mode ${m})}}`
+        ).join(" ");
+        sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=Set Mode for ${npc.name}}} {{Current: ${npc.mode || 'on'}}} ${modeList}`);
         return;
     }
 
@@ -1318,8 +1328,9 @@ function handleEditMonitoredNPC(msg) {
             }
             break;
         case 'img':
-            npc.img = value;
-            sendChat("NPC Monitor", `/w ${who} ${npc.name} image URL updated.`);
+            let clear = value.toLowerCase().trim() == 'clear';
+            npc.img = clear ? null : value;
+            sendChat("NPC Monitor", `/w ${who} ${clear ? 'Removed' : 'Updated'} ${npc.name} image url${clear ? '' : ` to "${value}"`}`);
             break;
         case 'cardstyle':
             let style = state.ProximityNPC.cardStyles.find(s => s.name.toLowerCase() === value.toLowerCase());

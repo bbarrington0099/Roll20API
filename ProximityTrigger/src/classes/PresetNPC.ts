@@ -12,7 +12,7 @@ export class PresetNPC {
     public readonly name: string;
     public readonly distance: number;
     public readonly messages: MessageObject[];
-    public readonly img: string;
+    public readonly img: string | null;
     public readonly cardStyle: string;
     public readonly timeout: number;
 
@@ -22,7 +22,7 @@ export class PresetNPC {
      * @param name - The trigger's display name
      * @param distance - Trigger distance in token body widths
      * @param messages - Array of possible messages
-     * @param img - URL to portrait/image
+     * @param img - URL to portrait/image (null to hide image)
      * @param cardStyle - Default card style name
      * @param timeout - Cooldown in ms (0 = permanent)
      */
@@ -30,7 +30,7 @@ export class PresetNPC {
         name: string,
         distance: number = 2,
         messages: MessageObject[] = [],
-        img: string = '',
+        img: string | null = null,
         cardStyle: string = 'Default',
         timeout: number = 10000
     ) {

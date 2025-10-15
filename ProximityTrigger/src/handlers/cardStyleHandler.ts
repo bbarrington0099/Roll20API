@@ -112,7 +112,7 @@ function showCardStyleEditDialog(
     ];
 
     const propertyLinks = properties.map(prop =>
-        `{{[${prop.name}: ${prop.attr == 'badge' ? (prop.value || 'None').slice(0, 16) : (prop.value || 'None')}](!pt -C ${toSafeName(cardStyle.name)} ${prop.attr})}}`
+        `{{[${prop.name}: ${prop.attr == 'badge' ? (prop.value || 'None').slice(0, 16) : (prop.value || 'None')}](!pt -C ${toSafeName(cardStyle.name)} ${prop.attr})}}${prop.attr == 'badge' && prop.value ? ` {{[Link](${prop.value || 'None'})}}` : ''}`
     ).join(' ');
 
     sendChat('Proximity Trigger',
@@ -152,8 +152,15 @@ function showCardStylePropertyPrompt(
             promptMessage = 'Enter text color ^any CSS color^:';
             break;
         case 'whisper':
-            promptMessage = 'Enter whisper mode ^\'character\', \'gm\', or \'off\'^:';
-            break;
+            const whispers = ['off', 'gm', 'character'].map(w => 
+                `{{[${w.toUpperCase()}](!pt -C ${toSafeName(cardStyle.name)} ${property} ${w})}}`
+            ).join(" ");
+            sendChat('Proximity Trigger',
+                `/w ${who} &{template:default} {{name=Set Whisper for ${cardStyle.name}}} ` +
+                `{{Current: ${currentValue}}} ` +
+                `${whispers}`
+            );
+            return;
         case 'badge':
             promptMessage = "Enter URL for Badge Image ^'clear' to remove^:"
             break;
@@ -167,7 +174,7 @@ function showCardStylePropertyPrompt(
 
     sendChat('Proximity Trigger',
         `/w ${who} &{template:default} {{name=Set ${property} for ${cardStyle.name}}} ` +
-        `{{Current: ${property == 'badge' ? (currentValue ? currentValue.slice(0, 30) : 'None') : (currentValue || '')}}} ` +
+        `{{Current: ${property == 'badge' ? currentValue ? `[Link](${currentValue || 'None'})` : `None` : (currentValue || '')}}} ` +
         `{{${promptMessage}=[Click Here](!pt -C ${toSafeName(cardStyle.name)} ${property} ?{${promptMessage}|${currentValue}})}}`
     );
 }
