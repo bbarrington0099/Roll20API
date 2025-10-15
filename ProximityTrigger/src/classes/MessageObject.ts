@@ -8,9 +8,9 @@
  * **Dynamic Content Support:**
  * Messages support special syntax for dynamic content:
  * - `{playerName}` - Triggering character's first name
- * - `{monitoredName}` - NPC's name who is speaking
+ * - `{monitoredName}` - Monitored entity's name
  * - `{playerName.attributeName}` - Character attribute values (e.g., {playerName.hp})
- * - `{monitoredName.attributeName}` - NPC's character attribute values
+ * - `{monitoredName.attributeName}` - Monitored entity's character attribute values
  * - `{1d6}`, `{2d20+3}`, `{1d8+2d6}` - Dice rolls (displayed in styled spans)
  * - `[Button Text](message)` - Creates clickable buttons that send messages to chat
  */

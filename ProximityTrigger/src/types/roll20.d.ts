@@ -332,7 +332,7 @@ declare global {
  *    - store: Main game data (HP, gold, level, abilities, etc.)
  *    - builder: Character creation/builder data
  * 
- * ProximityNPC automatically searches both direct and JSON attributes!
+ * ProximityTrigger automatically searches both direct and JSON attributes!
  */
 
 /**
@@ -362,7 +362,7 @@ export interface CharacterFrameworkAttributes {
 }
 
 /**
- * Common attribute names that can be used in ProximityNPC messages
+ * Common attribute names that can be used in ProximityTrigger messages
  * 
  * Usage in messages: {playerName.attributeName} or {monitoredName.attributeName}
  * 
@@ -477,7 +477,7 @@ export type CommonAttributeNames =
 /**
  * Attribute Alias Mappings
  * 
- * When ProximityNPC looks up an attribute, it tries these variations automatically.
+ * When ProximityTrigger looks up an attribute, it tries these variations automatically.
  * This allows users to type {playerName.hp} and have it find currentHP in the JSON.
  * 
  * YOU DON'T NEED TO MEMORIZE THIS - just use hp, gold, level, etc. and it works!
@@ -506,7 +506,7 @@ export const ATTRIBUTE_ALIASES: Record<string, string[]> = {
  * Known JSON container attributes in Roll20 character sheets
  * 
  * These attributes contain JSON data with nested character information.
- * ProximityNPC automatically searches these when looking for attributes.
+ * ProximityTrigger automatically searches these when looking for attributes.
  */
 export const JSON_CONTAINERS = ['store', 'builder', 'data', 'character', 'stats'] as const;
 
@@ -514,7 +514,7 @@ export const JSON_CONTAINERS = ['store', 'builder', 'data', 'character', 'stats'
  * Store Attribute Structure (D&D 5e by Roll20 sheet)
  * 
  * The 'store' attribute contains a JSON string with this structure.
- * ProximityNPC recursively searches through this to find attributes.
+ * ProximityTrigger recursively searches through this to find attributes.
  * 
  * Common attribute paths:
  * - currentHP: store.currentHP (depth 0)
@@ -570,7 +570,7 @@ export interface StoreAttributeStructure {
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- * HOW TO USE ATTRIBUTES IN PROXIMITYNPC MESSAGES - SIMPLE GUIDE
+ * HOW TO USE ATTRIBUTES IN PROXIMITYTRIGGER MESSAGES - SIMPLE GUIDE
  * ═══════════════════════════════════════════════════════════════════════════
  * 
  * Basic Syntax (JUST USE THESE!):
@@ -607,7 +607,7 @@ export interface StoreAttributeStructure {
  *    → "HP: 35/50, Gold: 150g, Level: 5"
  * 
  * Finding Attribute Names for YOUR Character Sheet:
- * Select a token and run: !proximitynpc --attributes
+ * Select a token and run: !pt --attributes
  * This lists ALL available attributes for that character with their values.
  * 
  * Fallback Behavior (Safe Defaults):

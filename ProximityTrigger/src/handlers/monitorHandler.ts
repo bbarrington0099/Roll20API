@@ -138,7 +138,7 @@ export function showEditMonitorNPCDialog(
                 return;
             }
         } else {
-            sendChat('Proximity Trigger', `/w ${msg.who} Please specify an NPC to edit.`);
+            sendChat('Proximity Trigger', `/w ${msg.who} Please specify an entity to edit.`);
             return;
         }
     }

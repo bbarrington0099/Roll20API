@@ -3,9 +3,9 @@
  * 
  * Handles dynamic replacements in messages:
  * - {playerName} - Triggering character's first name
- * - {monitoredName} - NPC's name who is speaking
+ * - {monitoredName} - Monitored entity's name
  * - {playerName.attributeName} - Character attribute values
- * - {monitoredName.attributeName} - NPC's character attribute values
+ * - {monitoredName.attributeName} - Monitored entity's character attribute values
  * - {1d6}, {2d20+3}, {1d8+2d6} - Dice rolls (styled)
  * - [Button Text](message) - Clickable buttons that send messages to chat
  */
@@ -367,7 +367,7 @@ export function extractButtons(text: string): ButtonExtraction {
  * @param messageContent - The raw message content with placeholders
  * @param displayName - The player name for display (first name only)
  * @param triggeringToken - The token that triggered the message (optional)
- * @param npc - The NPC that is speaking
+ * @param npc - The monitored entity
  * @param cardStyle - The card style for styling dice rolls
  * @param defaultStyle - The default card style
  * @returns Object with processed text and buttons

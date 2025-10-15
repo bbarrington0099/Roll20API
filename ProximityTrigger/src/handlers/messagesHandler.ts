@@ -18,7 +18,7 @@ export function handleMessages(msg: ChatMessage, state: ProximityTriggerState): 
     const who = msg.who || 'gm';
     const args = msg.content.trim().split(' ');
 
-    // Extract the NPC name from the command
+    // Extract the entity name from the command
     const safeName = args[2];
     const npcName = fromSafeName(safeName);
     const action = args[4] ? args[4].toLowerCase() : 'menu';
@@ -76,7 +76,7 @@ export function handleMessages(msg: ChatMessage, state: ProximityTriggerState): 
 }
 
 /**
- * Shows the main messages management menu for an NPC.
+ * Shows the main messages management menu for a monitored entity.
  */
 function showMessagesMenu(
     msg: ChatMessage,
@@ -385,7 +385,7 @@ function handleSetMessageCardStyle(
 }
 
 /**
- * Deletes a message from an NPC.
+ * Deletes a message from a monitored entity.
  */
 function handleDeleteMessage(
     msg: ChatMessage,

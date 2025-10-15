@@ -1,7 +1,7 @@
 /**
  * Delete NPC Handler
  * 
- * Removes an NPC from monitoring and clears its triggers.
+ * Removes a monitored entity from monitoring and clears its triggers.
  */
 
 import { toSafeName, fromSafeName } from '../utils/nameUtils.js';

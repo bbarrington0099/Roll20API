@@ -180,7 +180,7 @@
     /**
      * Delete NPC Handler
      *
-     * Removes an NPC from monitoring and clears its triggers.
+     * Removes a monitored entity from monitoring and clears its triggers.
      */
     /**
      * Deletes a monitored NPC or shows a menu of NPCs to delete.
@@ -375,9 +375,9 @@
      * **Dynamic Content Support:**
      * Messages support special syntax for dynamic content:
      * - `{playerName}` - Triggering character's first name
-     * - `{monitoredName}` - NPC's name who is speaking
+     * - `{monitoredName}` - Monitored entity's name
      * - `{playerName.attributeName}` - Character attribute values (e.g., {playerName.hp})
-     * - `{monitoredName.attributeName}` - NPC's character attribute values
+     * - `{monitoredName.attributeName}` - Monitored entity's character attribute values
      * - `{1d6}`, `{2d20+3}`, `{1d8+2d6}` - Dice rolls (displayed in styled spans)
      * - `[Button Text](message)` - Creates clickable buttons that send messages to chat
      */
@@ -436,9 +436,9 @@
      *
      * Handles dynamic replacements in messages:
      * - {playerName} - Triggering character's first name
-     * - {monitoredName} - NPC's name who is speaking
+     * - {monitoredName} - Monitored entity's name
      * - {playerName.attributeName} - Character attribute values
-     * - {monitoredName.attributeName} - NPC's character attribute values
+     * - {monitoredName.attributeName} - Monitored entity's character attribute values
      * - {1d6}, {2d20+3}, {1d8+2d6} - Dice rolls (styled)
      * - [Button Text](message) - Clickable buttons that send messages to chat
      */
@@ -713,7 +713,7 @@
      * @param messageContent - The raw message content with placeholders
      * @param displayName - The player name for display (first name only)
      * @param triggeringToken - The token that triggered the message (optional)
-     * @param npc - The NPC that is speaking
+     * @param npc - The monitored entity
      * @param cardStyle - The card style for styling dice rolls
      * @param defaultStyle - The default card style
      * @returns Object with processed text and buttons
@@ -789,17 +789,17 @@
      * Works for NPCs, traps, environment effects, passive checks, and more.
      */
     /**
-     * Triggers and displays an NPC message with styled card.
+     * Triggers and displays a proximity trigger message with styled card.
      * Handles mode changes (once → off) and applies appropriate styling.
      * Supports dynamic content:
      * - {playerName} - Triggering character's first name
-     * - {monitoredName} - NPC's name
+     * - {monitoredName} - Monitored entity's name
      * - {playerName.hp} - Character attributes
-     * - {monitoredName.hp} - NPC's attributes
+     * - {monitoredName.hp} - Monitored entity's attributes
      * - {1d6} - Dice rolls
      * - [Text](message) - Clickable buttons (can include [[rolls]], whispers, API commands)
      *
-     * @param npc - The NPC that was triggered
+     * @param npc - The monitored entity that was triggered
      * @param state - The ProximityTrigger state
      * @param playerName - The player who triggered the interaction
      * @param triggeringToken - The token that triggered the message (for attribute lookups)
@@ -812,7 +812,7 @@
             npc.mode = 'off';
         }
         const selectedMessage = getRandomMessage(npc.messages);
-        // Determine card style (priority: message override > NPC default > Default)
+        // Determine card style (priority: message override > entity default > Default)
         const defaultCardStyle = state.cardStyles.find(style => style.name === 'Default');
         let cardStyle = defaultCardStyle;
         if (npc.cardStyle) {
@@ -867,7 +867,7 @@
     /**
      * Builds the HTML for a styled message card.
      *
-     * @param npc - The NPC
+     * @param npc - The monitored entity
      * @param messageContent - The personalized message
      * @param cardStyle - The style to apply
      * @param defaultStyle - Fallback default style
@@ -926,7 +926,7 @@
     /**
      * Trigger Handler
      *
-     * Manually triggers an NPC message display.
+     * Manually triggers a proximity trigger message display.
      */
     /**
      * Handles manual triggering of NPC messages.
@@ -990,16 +990,16 @@
         /**
          * Creates a new MonitoredNPC.
          *
-         * @param name - The NPC's display name
+         * @param name - The trigger's display name
          * @param triggerDistance - Trigger distance in token body widths
-         * @param tokenIds - Array of Roll20 token IDs representing this NPC
+         * @param tokenIds - Array of Roll20 token IDs representing this trigger
          * @param timeout - Cooldown in ms before re-triggering (0 = permanent)
-         * @param img - Portrait URL
+         * @param img - Portrait/image URL
          * @param messages - Array of possible messages
-         * @param cardStyle - Card style name for this NPC
+         * @param cardStyle - Card style name for this trigger
          * @param mode - Operating mode: 'on', 'off', or 'once'
          */
-        constructor(name, triggerDistance = 2, tokenIds = [], timeout = 10000, img = 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/GuildEmblem.png', messages = [], cardStyle = 'Default', mode = 'on') {
+        constructor(name, triggerDistance = 2, tokenIds = [], timeout = 10000, img = 'https://github.com/bbarrington0099/Roll20API/blob/main/ProximityTrigger/src/ProximityTrigger.png', messages = [], cardStyle = 'Default', mode = 'on') {
             this.name = name;
             this.triggerDistance = triggerDistance;
             this.tokenIds = tokenIds;
@@ -1113,7 +1113,7 @@
                 }
             }
             else {
-                sendChat('Proximity Trigger', `/w ${msg.who} Please specify an NPC to edit.`);
+                sendChat('Proximity Trigger', `/w ${msg.who} Please specify an entity to edit.`);
                 return;
             }
         }
@@ -1179,7 +1179,7 @@
      * Shows an input prompt for a specific NPC property.
      *
      * @param msg - The chat message object
-     * @param npc - The NPC being edited
+     * @param npc - The monitored entity being edited
      * @param property - The property to edit
      * @param state - The ProximityTrigger state
      */
@@ -1206,7 +1206,7 @@
                     `{{Timeout (ms)=[Click Here](!pt -e ${safeName} timeout ?{Timeout|${currTimeout}})}}`);
                 break;
             case 'img':
-                const imgUrl = npc.img || 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/GuildEmblem.png';
+                const imgUrl = npc.img || 'https://github.com/bbarrington0099/Roll20API/blob/main/ProximityTrigger/src/ProximityTrigger.png';
                 sendChat('Proximity Trigger', `/w ${who} &{template:default} {{name=Set Image URL for ${npc.name}}} ` +
                     `{{Current: [Link](${npc.img || 'none'})}} ` +
                     `{{New URL=[Click Here](!pt -e ${safeName} img ?{Enter new image URL|${imgUrl}})}}`);
@@ -1222,10 +1222,10 @@
         }
     }
     /**
-     * Sets an NPC property to a new value.
+     * Sets a monitored entity property to a new value.
      *
      * @param msg - The chat message object
-     * @param npc - The NPC being edited
+     * @param npc - The monitored entity being edited
      * @param property - The property to set
      * @param value - The new value
      * @param state - The ProximityTrigger state
@@ -1559,7 +1559,7 @@
     function handleMessages(msg, state) {
         const who = msg.who || 'gm';
         const args = msg.content.trim().split(' ');
-        // Extract the NPC name from the command
+        // Extract the entity name from the command
         const safeName = args[2];
         const npcName = fromSafeName(safeName);
         const action = args[4] ? args[4].toLowerCase() : 'menu';
@@ -1613,7 +1613,7 @@
         }
     }
     /**
-     * Shows the main messages management menu for an NPC.
+     * Shows the main messages management menu for a monitored entity.
      */
     function showMessagesMenu(msg, npc, safeNPCName) {
         const who = msg.who || 'gm';
@@ -1786,7 +1786,7 @@
         handleMessages({ content: `!pt -M ${safeNPCName} messages edit ${msgIndex}`, who: who }, { monitoredNPCs: { [safeNPCName]: npc }, cardStyles: state.cardStyles });
     }
     /**
-     * Deletes a message from an NPC.
+     * Deletes a message from a monitored entity.
      */
     function handleDeleteMessage(msg, args, npc, safeNPCName) {
         const who = msg.who || 'gm';
@@ -1937,14 +1937,14 @@
         const movedCenterX = movedToken.get('left') + movedToken.get('width') / 2;
         const movedCenterY = movedToken.get('top') + movedToken.get('height') / 2;
         const playerName = getPlayerNameFromToken(movedToken);
-        // Check each monitored NPC
+        // Check each monitored entity
         Object.entries(state.monitoredNPCs).forEach(([_, npc]) => {
-            // Skip if this NPC doesn't have any tokens
+            // Skip if this entity doesn't have any tokens
             if (!npc.tokenIds || npc.tokenIds.length === 0)
                 return;
-            // Check each token representing this NPC
+            // Check each token representing this entity
             npc.tokenIds.forEach(tokenId => {
-                // Skip if the moved token is one of this NPC's tokens
+                // Skip if the moved token is one of this entity's tokens
                 if (tokenId === movedId)
                     return;
                 const npcToken = getObj('graphic', tokenId);
@@ -1953,7 +1953,7 @@
                 // Skip if not on same page
                 if (npcToken.get('pageid') !== pageId)
                     return;
-                // Calculate NPC token position
+                // Calculate entity token position
                 const npcCenterX = npcToken.get('left') + npcToken.get('width') / 2;
                 const npcCenterY = npcToken.get('top') + npcToken.get('height') / 2;
                 const distance = calculateDistance(npcCenterX, npcCenterY, movedCenterX, movedCenterY);

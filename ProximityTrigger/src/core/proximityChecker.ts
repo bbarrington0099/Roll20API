@@ -27,14 +27,14 @@ export function checkAllProximities(
     const movedCenterY = movedToken.get('top') + movedToken.get('height') / 2;
     const playerName = getPlayerNameFromToken(movedToken);
 
-    // Check each monitored NPC
+    // Check each monitored entity
     Object.entries(state.monitoredNPCs).forEach(([_, npc]) => {
-        // Skip if this NPC doesn't have any tokens
+        // Skip if this entity doesn't have any tokens
         if (!npc.tokenIds || npc.tokenIds.length === 0) return;
 
-        // Check each token representing this NPC
+        // Check each token representing this entity
         npc.tokenIds.forEach(tokenId => {
-            // Skip if the moved token is one of this NPC's tokens
+            // Skip if the moved token is one of this entity's tokens
             if (tokenId === movedId) return;
 
             const npcToken = getObj('graphic', tokenId) as Graphic | undefined;
@@ -43,7 +43,7 @@ export function checkAllProximities(
             // Skip if not on same page
             if (npcToken.get('pageid') !== pageId) return;
 
-            // Calculate NPC token position
+            // Calculate entity token position
             const npcCenterX = npcToken.get('left') + npcToken.get('width') / 2;
             const npcCenterY = npcToken.get('top') + npcToken.get('height') / 2;
 

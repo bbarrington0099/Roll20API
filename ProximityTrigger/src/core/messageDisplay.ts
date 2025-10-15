@@ -11,17 +11,17 @@ import { MonitoredNPC } from '../classes/MonitoredNPC.js';
 import { CardStyle } from '../classes/CardStyle.js';
 
 /**
- * Triggers and displays an NPC message with styled card.
+ * Triggers and displays a proximity trigger message with styled card.
  * Handles mode changes (once → off) and applies appropriate styling.
  * Supports dynamic content:
  * - {playerName} - Triggering character's first name
- * - {monitoredName} - NPC's name
+ * - {monitoredName} - Monitored entity's name
  * - {playerName.hp} - Character attributes
- * - {monitoredName.hp} - NPC's attributes
+ * - {monitoredName.hp} - Monitored entity's attributes
  * - {1d6} - Dice rolls
  * - [Text](message) - Clickable buttons (can include [[rolls]], whispers, API commands)
  * 
- * @param npc - The NPC that was triggered
+ * @param npc - The monitored entity that was triggered
  * @param state - The ProximityTrigger state
  * @param playerName - The player who triggered the interaction
  * @param triggeringToken - The token that triggered the message (for attribute lookups)
@@ -41,7 +41,7 @@ export function triggerNPCMessage(
 
     const selectedMessage = getRandomMessage(npc.messages);
 
-    // Determine card style (priority: message override > NPC default > Default)
+    // Determine card style (priority: message override > entity default > Default)
     const defaultCardStyle = state.cardStyles.find(style => style.name === 'Default');
     let cardStyle: CardStyle | undefined = defaultCardStyle;
 
@@ -114,7 +114,7 @@ export function triggerNPCMessage(
 /**
  * Builds the HTML for a styled message card.
  * 
- * @param npc - The NPC
+ * @param npc - The monitored entity
  * @param messageContent - The personalized message
  * @param cardStyle - The style to apply
  * @param defaultStyle - Fallback default style

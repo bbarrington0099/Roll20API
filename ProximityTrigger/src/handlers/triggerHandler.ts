@@ -1,7 +1,7 @@
 /**
  * Trigger Handler
  * 
- * Manually triggers an NPC message display.
+ * Manually triggers a proximity trigger message display.
  */
 
 import { getTokenFromCall, getTokenEffectiveName, getPlayerNameFromToken } from '../utils/tokenUtils.js';

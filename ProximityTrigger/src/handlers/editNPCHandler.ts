@@ -55,7 +55,7 @@ export function handleEditNPC(msg: ChatMessage, state: ProximityTriggerState): v
  * Shows an input prompt for a specific NPC property.
  * 
  * @param msg - The chat message object
- * @param npc - The NPC being edited
+ * @param npc - The monitored entity being edited
  * @param property - The property to edit
  * @param state - The ProximityTrigger state
  */
@@ -99,7 +99,7 @@ function showPropertyInputPrompt(
             break;
 
         case 'img':
-            const imgUrl = npc.img || 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/GuildEmblem.png';
+            const imgUrl = npc.img || 'https://github.com/bbarrington0099/Roll20API/blob/main/ProximityTrigger/src/ProximityTrigger.png';
             sendChat('Proximity Trigger',
                 `/w ${who} &{template:default} {{name=Set Image URL for ${npc.name}}} ` +
                 `{{Current: [Link](${npc.img || 'none'})}} ` +
@@ -122,10 +122,10 @@ function showPropertyInputPrompt(
 }
 
 /**
- * Sets an NPC property to a new value.
+ * Sets a monitored entity property to a new value.
  * 
  * @param msg - The chat message object
- * @param npc - The NPC being edited
+ * @param npc - The monitored entity being edited
  * @param property - The property to set
  * @param value - The new value
  * @param state - The ProximityTrigger state

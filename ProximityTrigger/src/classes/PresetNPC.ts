@@ -19,10 +19,10 @@ export class PresetNPC {
     /**
      * Creates a new PresetNPC template.
      * 
-     * @param name - The NPC's display name
+     * @param name - The trigger's display name
      * @param distance - Trigger distance in token body widths
      * @param messages - Array of possible messages
-     * @param img - URL to NPC's portrait image
+     * @param img - URL to portrait/image
      * @param cardStyle - Default card style name
      * @param timeout - Cooldown in ms (0 = permanent)
      */
