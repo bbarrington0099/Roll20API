@@ -36,7 +36,7 @@ export class MonitoredNPC {
         triggerDistance: number = 2,
         tokenIds: string[] = [],
         timeout: number = 10000,
-        img: string = 'https://github.com/bbarrington0099/Roll20API/blob/main/ProximityTrigger/src/ProximityTrigger.png',
+        img: string = 'https://raw.githubusercontent.com/bbarrington0099/Roll20API/main/ProximityTrigger/src/ProximityTrigger.png',
         messages: MessageObject[] = [],
         cardStyle: string = 'Default',
         mode: 'on' | 'off' | 'once' = 'on'

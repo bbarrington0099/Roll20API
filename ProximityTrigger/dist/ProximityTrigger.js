@@ -50,7 +50,7 @@
                 defaultTimeout: 10000,
                 monitoredNPCs: {},
                 cardStyles: [
-                    new CardStyle('Default')
+                    new CardStyle('Default', undefined, undefined, undefined, undefined, "off", "https://raw.githubusercontent.com/bbarrington0099/Roll20API/main/ProximityTrigger/src/ProximityTrigger.png")
                 ],
                 buttonCallbacks: {}
             };
@@ -999,7 +999,7 @@
          * @param cardStyle - Card style name for this trigger
          * @param mode - Operating mode: 'on', 'off', or 'once'
          */
-        constructor(name, triggerDistance = 2, tokenIds = [], timeout = 10000, img = 'https://github.com/bbarrington0099/Roll20API/blob/main/ProximityTrigger/src/ProximityTrigger.png', messages = [], cardStyle = 'Default', mode = 'on') {
+        constructor(name, triggerDistance = 2, tokenIds = [], timeout = 10000, img = 'https://raw.githubusercontent.com/bbarrington0099/Roll20API/main/ProximityTrigger/src/ProximityTrigger.png', messages = [], cardStyle = 'Default', mode = 'on') {
             this.name = name;
             this.triggerDistance = triggerDistance;
             this.tokenIds = tokenIds;
@@ -1206,7 +1206,7 @@
                     `{{Timeout (ms)=[Click Here](!pt -e ${safeName} timeout ?{Timeout|${currTimeout}})}}`);
                 break;
             case 'img':
-                const imgUrl = npc.img || 'https://github.com/bbarrington0099/Roll20API/blob/main/ProximityTrigger/src/ProximityTrigger.png';
+                const imgUrl = npc.img || 'https://raw.githubusercontent.com/bbarrington0099/Roll20API/main/ProximityTrigger/src/ProximityTrigger.png';
                 sendChat('Proximity Trigger', `/w ${who} &{template:default} {{name=Set Image URL for ${npc.name}}} ` +
                     `{{Current: [Link](${npc.img || 'none'})}} ` +
                     `{{New URL=[Click Here](!pt -e ${safeName} img ?{Enter new image URL|${imgUrl}})}}`);

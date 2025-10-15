@@ -20,7 +20,7 @@ export function initializeState(): ProximityTriggerState {
             defaultTimeout: 10000,
             monitoredNPCs: {},
             cardStyles: [
-                new CardStyle('Default')
+                new CardStyle('Default', undefined, undefined, undefined, undefined, "off", "https://raw.githubusercontent.com/bbarrington0099/Roll20API/main/ProximityTrigger/src/ProximityTrigger.png")
             ],
             buttonCallbacks: {}
         };

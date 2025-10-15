@@ -99,7 +99,7 @@ function showPropertyInputPrompt(
             break;
 
         case 'img':
-            const imgUrl = npc.img || 'https://github.com/bbarrington0099/Roll20API/blob/main/ProximityTrigger/src/ProximityTrigger.png';
+            const imgUrl = npc.img || 'https://raw.githubusercontent.com/bbarrington0099/Roll20API/main/ProximityTrigger/src/ProximityTrigger.png';
             sendChat('Proximity Trigger',
                 `/w ${who} &{template:default} {{name=Set Image URL for ${npc.name}}} ` +
                 `{{Current: [Link](${npc.img || 'none'})}} ` +
