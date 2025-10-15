@@ -15,7 +15,7 @@ class CardStyle {
      * @param {string} whisper - Whisper to 'character', 'gm', 'off'
      * @param {string} badge - Optional url to badge image
      */
-    constructor(name, borderColor = '#8b4513', backgroundColor = '#f4e8d8', bubbleColor = '#ffffff', textColor = '#2c1810', whisper = 'off', badge=null) {
+    constructor(name, borderColor = '#8b4513', backgroundColor = '#f4e8d8', bubbleColor = '#ffffff', textColor = '#2c1810', whisper = 'off', badge = null) {
         this.name = name;
         this.borderColor = borderColor;
         this.backgroundColor = backgroundColor;
@@ -28,13 +28,20 @@ class CardStyle {
 
 /**
  * Represents a message with content, weight, and optional card style.
+ * Supports dynamic content replacements:
+ * - {playerName} - Replaced with triggering character's first name
+ * - {monitoredName} - Replaced with the NPC's name who is speaking
+ * - {playerName.attributeName} - Replaced with character attribute value (e.g., {playerName.hp})
+ * - {monitoredName.attributeName} - Replaced with NPC's character attribute value (if NPC has sheet)
+ * - {1d6}, {2d20+3}, {1d8+2d6} - Dice rolls (displayed in styled spans with inverted colors)
+ * - [Button Text](message) - Creates clickable buttons that send messages to chat
  * @class
  */
 class MessageObject {
     /**
      * Creates a new MessageObject.
-     * @param {string} content - The message text content
-     * @param {number} weight - Relative probability weight for random selection (default: 1)
+     * @param {string} content - The message text content with optional dynamic placeholders
+     * @param {number} weight - Relative probability weight for random selection (default: 1, 0 = disabled)
      * @param {string} cardStyle - Optional card style name to override default styling
      */
     constructor(content, weight = 1, cardStyle = null) {
@@ -99,6 +106,7 @@ class MonitoredNPC {
 state.ProximityNPC = {
     defaultImagePath: '',
     defaultDistance: 2,
+    buttonCallbacks: {},
     presetNPCs: [
         new PresetNPC(
             'Tharos Raggenthraw',
@@ -127,7 +135,10 @@ state.ProximityNPC = {
                 // Relationship messages
                 new MessageObject('"Lumen reminds me of myself at his age - so much heartache, but such determination. I make sure he gets extra sweets when Keoti isn\'t looking."', 2),
                 new MessageObject('"Bolagor and I have an arrangement - my best ale for his spiciest stew. The resulting feast nearly brought Tharos to tears last Winter\'s Crest."', 2),
-                new MessageObject('"Snek once tried to help me serve drinks. We lost three mugs and gained a wonderful story. That kobold means well, even when he\'s a disaster."', 1)
+                new MessageObject('"Snek once tried to help me serve drinks. We lost three mugs and gained a wonderful story. That kobold means well, even when he\'s a disaster."', 1),
+                // Example dynamic content messages
+                new MessageObject('"Looking a bit rough there, {playerName}. You\'re at {playerName.hp} health - let me pour you something restorative." [Accept Drink](w {playerName} You drink deeply and feel slightly better)', 0.5),
+                new MessageObject('"Roll for a drinking contest!" She slides a mug across the bar. You rolled: {1d20+3}! "Not bad, {playerName}!"', 0.5)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/KinrisMorranfew.png',
             'Coal Rank'
@@ -344,15 +355,15 @@ state.ProximityNPC = {
     ],
     monitoredNPCs: {},
     cardStyles: [
-    new CardStyle('Default'),
-    new CardStyle('Coal Rank', '#2b2b2b', '#3a3a3a', '#555555', '#e0e0e0', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/coal_rank.png'),
-    new CardStyle('Copper Rank', '#b87333', '#ffe5b4', '#fff2e0', '#4a2c00', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/copper_rank.png'),
-    new CardStyle('Iron Rank', '#5a5a5a', '#d8d8d8', '#f5f5f5', '#1e1e1e', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/iron_rank.png'),
-    new CardStyle('Silver Rank', '#c0c0c0', '#f8f8f8', '#ffffff', '#303030', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/silver_rank.png'),
-    new CardStyle('Gold Rank', '#ffd700', '#fff8dc', '#fffaf0', '#5a4300', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/gold_rank.png'),
-    new CardStyle('Platinum Rank', '#e5e4e2', '#fefefe', '#ffffff', '#222222', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/platinum_rank.png'),
-    new CardStyle('Mithral Rank', '#7fd4ff', '#e6f7ff', '#f0fbff', '#00334d', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/mithral_rank.png')
-]
+        new CardStyle('Default'),
+        new CardStyle('Coal Rank', '#2b2b2b', '#3a3a3a', '#555555', '#e0e0e0', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/coal_rank.png'),
+        new CardStyle('Copper Rank', '#b87333', '#ffe5b4', '#fff2e0', '#4a2c00', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/copper_rank.png'),
+        new CardStyle('Iron Rank', '#5a5a5a', '#d8d8d8', '#f5f5f5', '#1e1e1e', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/iron_rank.png'),
+        new CardStyle('Silver Rank', '#c0c0c0', '#f8f8f8', '#ffffff', '#303030', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/silver_rank.png'),
+        new CardStyle('Gold Rank', '#ffd700', '#fff8dc', '#fffaf0', '#5a4300', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/gold_rank.png'),
+        new CardStyle('Platinum Rank', '#e5e4e2', '#fefefe', '#ffffff', '#222222', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/platinum_rank.png'),
+        new CardStyle('Mithral Rank', '#7fd4ff', '#e6f7ff', '#f0fbff', '#00334d', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/mithral_rank.png')
+    ]
 
 }
 
@@ -366,6 +377,21 @@ let triggeredTokens = {};
 function setupNPCProximity() {
     on('chat:message', function (msg) {
         let who = msg.who || "gm";
+
+        // Listen for button clicks
+        if (msg.type == "api" && msg.content.startsWith("!proximitynpc-button")) {
+            let args = msg.content.trim().split(" ");
+            if (args.length > 1) {
+                let buttonId = args[1];
+                if (state.ProximityNPC.buttonCallbacks && state.ProximityNPC.buttonCallbacks[buttonId]) {
+                    let callback = state.ProximityNPC.buttonCallbacks[buttonId];
+                    sendChat(callback.sender, callback.whisper + callback.message);
+                    // Clean up the callback
+                    delete state.ProximityNPC.buttonCallbacks[buttonId];
+                }
+            }
+            return;
+        }
 
         // Listen for API commands to add NPCs to monitoring
         if (msg.type == "api" && msg.content.startsWith("!proximitynpc")) {
@@ -679,7 +705,7 @@ function showEditMonitorNPCDialog(msg, token) {
  */
 function showHelpMessage(msg = { who: "gm" }) {
     let who = msg.who || "gm";
-    sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=NPC Proximity Monitor Help}} {{!proximitynpc=Main call (must include one flag)}} {{--monitor|-M [Token/Name]=Add or edit an NPC monitor (requires a token or name). Use underscores for spaces.}} {{--list|-l=List all monitored NPCs}} {{--menu|-m=Open the ProximityNPC menu}} {{--edit|-e [Name] [prop] [value]=Edit a monitored NPC's property (prop: triggerDistance, timeout, img, cardStyle)}} {{--trigger|-t [Token/Name]=Manually trigger an NPC message}} {{--cardstyles|-cl=List all card styles}} {{--cardstyle|-C [StyleName] [property] [value]=Edit or create a card style}} {{--delete|-D [Name]=Delete a monitored NPC}} {{--help|-h=Show this help}}`);
+    sendChat("NPC Monitor", `/w ${who} &{template:default} {{name=NPC Proximity Monitor Help}} {{!proximitynpc=Main call (must include one flag)}} {{--monitor|-M [Token/Name]=Add or edit an NPC monitor (requires a token or name). Use underscores for spaces.}} {{--list|-l=List all monitored NPCs}} {{--menu|-m=Open the ProximityNPC menu}} {{--edit|-e [Name] [prop] [value]=Edit a monitored NPC's property (prop: triggerDistance, timeout, img, cardStyle)}} {{--trigger|-t [Token/Name]=Manually trigger an NPC message}} {{--attributes|-a [Token]=List all attributes for selected token/character}} {{--cardstyles|-cl=List all card styles}} {{--cardstyle|-C [StyleName] [property] [value]=Edit or create a card style}} {{--delete|-D [Name]=Delete a monitored NPC}} {{--help|-h=Show this help}} {{**Dynamic Message Content**=Messages support special syntax:}} {{{playerName}=Triggering character's first name}} {{{monitoredName}=NPC's name}} {{{playerName.hp}=Character attribute value}} {{{monitoredName.hp}=NPC's attribute value}} {{{1d6} or {2d20+3}=Dice rolls (styled)}} {{[Text](message)=Clickable button (can include rolls with [[1d6]], whispers, API calls)}}`);
 }
 
 /**
@@ -1268,7 +1294,7 @@ function handleEditMonitoredNPC(msg) {
 
 
     let value = args.slice(4).join(" ").trim();
-    
+
     switch (property) {
         case 'triggerdistance':
             let dist = parseFloat(value);
@@ -1350,13 +1376,20 @@ function handleListMonitoredNPCs(msg) {
 
 /**
  * Handles manual NPC triggering.
- * If a token is selected, triggers that NPC.
+ * If a token is selected, triggers that NPC using the selected token as the triggering character.
  * If no token is selected and no name is provided, lists all monitored NPCs for selection.
  * @param {Object} msg - The chat message object.
  */
 function handleTriggerNPC(msg) {
     const who = msg.who || "gm";
     const args = msg.content.trim().split(/\s+/);
+
+    // Get the selected token if any (for character attribute lookups)
+    let selectedToken = null;
+    if (msg.selected && msg.selected.length > 0) {
+        selectedToken = getObj('graphic', msg.selected[0]._id);
+    }
+
     const token = getTokenFromCall(msg);
 
     // If a token is selected → trigger its monitored NPC
@@ -1368,7 +1401,9 @@ function handleTriggerNPC(msg) {
             sendChat("NPC Monitor", `/w ${who} Token "${tokenName}" is not a monitored NPC.`);
             return;
         }
-        triggerNPCMessage(monitoredNPC);
+        // Use selectedToken if available, otherwise use default
+        let playerName = selectedToken ? getPlayerNameFromToken(selectedToken) : "Guild Member";
+        triggerNPCMessage(monitoredNPC, playerName, selectedToken);
         return;
     }
 
@@ -1378,7 +1413,8 @@ function handleTriggerNPC(msg) {
         const npcName = fromSafeName(safeName);
         const monitoredNPC = state.ProximityNPC.monitoredNPCs[safeName];
         if (monitoredNPC) {
-            triggerNPCMessage(monitoredNPC);
+            let playerName = selectedToken ? getPlayerNameFromToken(selectedToken) : "Guild Member";
+            triggerNPCMessage(monitoredNPC, playerName, selectedToken);
             return;
         }
     }
@@ -1484,7 +1520,7 @@ function checkAllProximities(movedToken) {
             let key = movedId + '_' + tokenId;
 
             if (distance <= threshold && !triggeredTokens[key]) {
-                triggerNPCMessage(npc, playerName);
+                triggerNPCMessage(npc, playerName, movedToken);
                 triggeredTokens[key] = true;
                 setTimeout(() => {
                     if (npc.timeout !== 0) delete triggeredTokens[key];
@@ -1506,6 +1542,390 @@ function getPlayerNameFromToken(token) {
         if (character) return character.get('name').split(" ")[0] || 'Guild Member';
     }
     return 'Guild Member';
+}
+
+/**
+ * Retrieves the character object from a token.
+ * @param {Graphic} token - The token to get the character from.
+ * @returns {Character|null} The character object or null if not found.
+ */
+function getCharacterFromToken(token) {
+    let charId = token.get('represents');
+    if (charId) {
+        return getObj('character', charId);
+    }
+    return null;
+}
+
+/**
+ * Parses and executes a dice roll expression (e.g., "1d6", "2d20+3", "1d8+2d6").
+ * @param {string} rollExpression - The dice roll expression to parse.
+ * @returns {Object} Object with {result: number, expression: string, success: boolean}
+ */
+function parseDiceRoll(rollExpression) {
+    try {
+        // Clean up the expression
+        let expr = rollExpression.trim().replace(/\s+/g, '');
+        let originalExpr = expr;
+
+        // Pattern to match dice notation: XdY where X and Y are numbers
+        let dicePattern = /(\d+)d(\d+)/gi;
+        let workingExpr = expr;
+        let detailParts = [];
+
+        // Track positions of dice rolls to build detailed breakdown
+        let lastIndex = 0;
+        let matches = [];
+
+        // Collect all matches first
+        let match;
+        while ((match = dicePattern.exec(expr)) !== null) {
+            matches.push({
+                fullMatch: match[0],
+                numDice: parseInt(match[1]),
+                numSides: parseInt(match[2]),
+                index: match.index
+            });
+        }
+
+        // Process each dice roll
+        let offset = 0;
+        matches.forEach(m => {
+            // Validate dice parameters
+            if (m.numDice <= 0 || m.numDice > 100 || m.numSides <= 0 || m.numSides > 1000) {
+                throw new Error('Invalid dice parameters');
+            }
+
+            // Roll the dice
+            let rollTotal = 0;
+            let rolls = [];
+            for (let i = 0; i < m.numDice; i++) {
+                let roll = Math.floor(Math.random() * m.numSides) + 1;
+                rolls.push(roll);
+                rollTotal += roll;
+            }
+
+            // Add any text before this dice roll to detail
+            let beforeText = originalExpr.substring(lastIndex, m.index);
+            if (beforeText) {
+                detailParts.push(beforeText);
+            }
+
+            // Add the dice roll detail
+            detailParts.push(`${m.numDice}d${m.numSides}=[${rolls.join(',')}]`);
+            lastIndex = m.index + m.fullMatch.length;
+
+            // Replace in working expression
+            let replaceIndex = m.index + offset;
+            workingExpr = workingExpr.substring(0, replaceIndex) +
+                rollTotal.toString() +
+                workingExpr.substring(replaceIndex + m.fullMatch.length);
+            offset += rollTotal.toString().length - m.fullMatch.length;
+        });
+
+        // Add any remaining text after the last dice roll
+        if (lastIndex < originalExpr.length) {
+            detailParts.push(originalExpr.substring(lastIndex));
+        }
+
+        // Evaluate the final mathematical expression
+        // Only allow numbers, +, -, *, /, (, ) for safety
+        if (!/^[\d+\-*/().\s]+$/.test(workingExpr)) {
+            return { result: 0, expression: rollExpression, success: false };
+        }
+
+        let result = eval(workingExpr);
+
+        return {
+            result: Math.round(result),
+            expression: rollExpression,
+            details: detailParts.join(''),
+            success: true
+        };
+    } catch (error) {
+        log(`Error parsing dice roll "${rollExpression}": ${error}`);
+        return { result: 0, expression: rollExpression, success: false };
+    }
+}
+
+/**
+ * Searches within a JSON object for a value by key name (case-insensitive, recursive).
+ * @param {Object} obj - The object to search
+ * @param {string} keyName - The key name to find
+ * @param {number} depth - Current recursion depth
+ * @returns {*} The value if found, null otherwise
+ */
+function searchJsonForKey(obj, keyName, depth = 0) {
+    if (!obj || typeof obj !== 'object') return null;
+
+    let lowerKeyName = keyName.toLowerCase();
+
+    // Check current level keys
+    for (let key in obj) {
+        if (key.toLowerCase() === lowerKeyName) {
+            return obj[key];
+        }
+    }
+
+    // Recursively search nested objects (limit depth to avoid infinite loops)
+    if (depth < 10) {
+        for (let key in obj) {
+            if (typeof obj[key] === 'object') {
+                let result = searchJsonForKey(obj[key], keyName, depth + 1);
+                if (result !== null && result !== undefined) return result;
+            }
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Gets a character attribute value by name.
+ * @param {Character} character - The character object.
+ * @param {string} attrName - The attribute name to look up.
+ * @returns {string} The attribute value or a fallback message.
+ */
+function getCharacterAttribute(character, attrName) {
+    if (!character) {
+        return `[No Character]`;
+    }
+
+    try {
+        // Get all attributes for this character
+        let attrs = findObjs({
+            _type: 'attribute',
+            _characterid: character.id
+        });
+
+        // Try exact match first
+        let attr = attrs.find(a => a.get('name') === attrName);
+
+        // If not found, try case-insensitive match
+        if (!attr) {
+            attr = attrs.find(a => a.get('name').toLowerCase() === attrName.toLowerCase());
+        }
+
+        if (attr) {
+            let current = attr.get('current');
+            return current !== undefined && current !== null ? current.toString() : '[Empty]';
+        }
+
+        // If not found as direct attribute, search in JSON attributes
+        // Build list of possible attribute name variations
+        let namesToTry = [attrName];
+        let lowerAttr = attrName.toLowerCase();
+
+        // Add common variations for HP
+        if (lowerAttr === 'hp') {
+            namesToTry.push('currentHP', 'current_hp', 'hitpoints', 'hit_points', 'HP', 'health');
+        }
+
+        // Add common variations for max HP
+        if (lowerAttr === 'maxhp' || lowerAttr === 'max_hp') {
+            namesToTry.push('maximumWithoutTemp', 'hp_max', 'maximum_hp', 'maxhp', 'max_hp');
+        }
+
+        // Add common variations for gold
+        if (lowerAttr === 'gold' || lowerAttr === 'gp') {
+            namesToTry.push('gold', 'gp', 'goldPieces', 'gold_pieces');
+        }
+
+        // Add common variations for level
+        if (lowerAttr === 'level' || lowerAttr === 'lvl') {
+            namesToTry.push('level', 'characterLevel', 'character_level', 'lvl');
+        }
+
+        // Add common variations for AC
+        if (lowerAttr === 'ac') {
+            namesToTry.push('ac', 'armorClass', 'armor_class', 'armour_class', 'AC');
+        }
+
+        // Add common variations for inspiration
+        if (lowerAttr === 'inspiration' || lowerAttr === 'inspired') {
+            namesToTry.push('inspiration', 'isInspired', 'is_inspired', 'inspired');
+        }
+
+        // Add common variations for ability scores
+        const abilityAliases = {
+            'str': ['str', 'strength', 'STR', 'Strength'],
+            'dex': ['dex', 'dexterity', 'DEX', 'Dexterity'],
+            'con': ['con', 'constitution', 'CON', 'Constitution'],
+            'int': ['int', 'intelligence', 'INT', 'Intelligence'],
+            'wis': ['wis', 'wisdom', 'WIS', 'Wisdom'],
+            'cha': ['cha', 'charisma', 'CHA', 'Charisma']
+        };
+
+        for (let [shortName, variations] of Object.entries(abilityAliases)) {
+            if (lowerAttr === shortName || lowerAttr === variations[1].toLowerCase()) {
+                namesToTry.push(...variations);
+                break;
+            }
+        }
+
+        // Add modifiers
+        const modAliases = {
+            'strength_mod': ['strength_mod', 'str_mod', 'strengthMod', 'strMod'],
+            'dexterity_mod': ['dexterity_mod', 'dex_mod', 'dexterityMod', 'dexMod'],
+            'constitution_mod': ['constitution_mod', 'con_mod', 'constitutionMod', 'conMod'],
+            'intelligence_mod': ['intelligence_mod', 'int_mod', 'intelligenceMod', 'intMod'],
+            'wisdom_mod': ['wisdom_mod', 'wis_mod', 'wisdomMod', 'wisMod'],
+            'charisma_mod': ['charisma_mod', 'cha_mod', 'charismaMod', 'chaMod']
+        };
+
+        for (let [modName, variations] of Object.entries(modAliases)) {
+            if (lowerAttr === modName || lowerAttr === variations[1]) {
+                namesToTry.push(...variations);
+                break;
+            }
+        }
+
+        // Search common JSON container attributes
+        let jsonContainers = ['store', 'builder', 'data', 'character', 'stats'];
+        for (let containerName of jsonContainers) {
+            let containerAttr = attrs.find(a => a.get('name') === containerName);
+            if (containerAttr) {
+                let value = containerAttr.get('current');
+                try {
+                    let parsed = typeof value === 'string' ? JSON.parse(value) : value;
+
+                    // Try all name variations
+                    for (let nameVariant of namesToTry) {
+                        let found = searchJsonForKey(parsed, nameVariant);
+                        if (found !== null && found !== undefined) {
+                            return found.toString();
+                        }
+                    }
+                } catch (e) {
+                    // Not JSON or parse error, continue to next container
+                }
+            }
+        }
+
+        // If still not found, return a fallback
+        return `[${attrName}?]`;
+    } catch (error) {
+        log(`ProximityNPC ERROR getting attribute "${attrName}": ${error}`);
+        return `[Error]`;
+    }
+}
+
+/**
+ * Extracts buttons from text and creates clickable chat buttons.
+ * Buttons send messages to chat when clicked.
+ * @param {string} text - The text containing button syntax.
+ * @returns {Object} {text: string (without buttons), buttonCommands: array of button info}
+ */
+function extractButtons(text) {
+    // Pattern to match [Button Text](message)
+    let buttonPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
+    let buttonCommands = [];
+
+    // Extract all buttons
+    let match;
+    while ((match = buttonPattern.exec(text)) !== null) {
+        let buttonText = match[1].trim();
+        let message = match[2].trim();
+
+        // Store the button info
+        buttonCommands.push({
+            text: buttonText,
+            message: message
+        });
+    }
+
+    // Remove button syntax from text
+    let cleanText = text.replace(buttonPattern, '');
+
+    return { text: cleanText, buttonCommands: buttonCommands };
+}
+
+/**
+ * Processes all dynamic replacements in a message (rolls, attributes, buttons).
+ * @param {string} messageContent - The raw message content with placeholders.
+ * @param {string} displayName - The player name for display (first name only).
+ * @param {Graphic} triggeringToken - The token that triggered the message (optional).
+ * @param {MonitoredNPC} npc - The NPC that is speaking (for {monitoredName}).
+ * @param {Object} cardStyle - The card style for styling.
+ * @param {Object} defaultStyle - The default card style.
+ * @returns {Object} {text: processed message, buttons: array of button markdown}
+ */
+function processMessageDynamics(messageContent, displayName, triggeringToken, npc, cardStyle, defaultStyle) {
+    let processed = messageContent;
+
+    // Get the character from the triggering token (if available)
+    let character = triggeringToken ? getCharacterFromToken(triggeringToken) : null;
+
+    // Get the full character name directly from the character object (not from split name)
+    let fullCharacterName = character ? character.get('name') : null;
+
+    // Get NPC's character if the NPC has tokens with character sheets
+    let npcCharacter = null;
+    if (npc && npc.tokenIds && npc.tokenIds.length > 0) {
+        let npcToken = getObj('graphic', npc.tokenIds[0]);
+        if (npcToken) {
+            npcCharacter = getCharacterFromToken(npcToken);
+        }
+    }
+    let npcName = npc ? npc.name : 'NPC';
+
+    // 1. Replace {playerName} with display name (first name only)
+    processed = processed.replace(/{playerName}/g, displayName);
+
+    // 2. Replace {monitoredName} with the NPC's name
+    processed = processed.replace(/{monitoredName}/g, npcName);
+
+    // 3. Parse and replace character attributes {playerName.attributeName}, {monitoredName.attributeName}
+    // Pattern: {playerName.something} or {characterName.something} or {monitoredName.something}
+    let attrPattern = /{([\w\s]+)\.([\w\-_]+)}/g;
+    processed = processed.replace(attrPattern, (match, charRef, attrName) => {
+        // If it references playerName or the actual character name, use the triggering token's character
+        if (charRef.toLowerCase() === 'playername' ||
+            (fullCharacterName && charRef.toLowerCase() === fullCharacterName.toLowerCase())) {
+            return getCharacterAttribute(character, attrName);
+        }
+
+        // If it references monitoredName or the NPC's name, use the NPC's character
+        if (charRef.toLowerCase() === 'monitoredname' ||
+            (npcName && charRef.toLowerCase() === npcName.toLowerCase())) {
+            return getCharacterAttribute(npcCharacter, attrName);
+        }
+
+        // Try to find a character by the referenced name
+        let refChar = findObjs({ _type: 'character', name: charRef })[0];
+        if (refChar) {
+            return getCharacterAttribute(refChar, attrName);
+        }
+
+        return `[${charRef}.${attrName}?]`;
+    });
+
+    // 4. Parse and execute dice rolls {1d6}, {2d20+3}, etc.
+    let rollPattern = /{([0-9d+\-*/()\s]+)}/g;
+    processed = processed.replace(rollPattern, (match, rollExpr) => {
+        // Check if this looks like a dice roll (contains 'd')
+        if (!rollExpr.toLowerCase().includes('d')) {
+            return match; // Not a dice roll, leave as is
+        }
+
+        let rollResult = parseDiceRoll(rollExpr);
+
+        if (rollResult.success) {
+            // Style the roll result with inverted colors
+            let bgColor = cardStyle.textColor || defaultStyle.textColor;
+            let textColor = cardStyle.bubbleColor || defaultStyle.bubbleColor;
+            let borderColor = cardStyle.borderColor || defaultStyle.borderColor;
+
+            return `<span style="background: ${bgColor}; color: ${textColor}; border: 1px solid ${borderColor}; border-radius: 4px; padding: 2px 6px; font-weight: bold; font-family: monospace;" title="${rollResult.details}">${rollResult.result}</span>`;
+        } else {
+            return `<span style="color: red; font-weight: bold;">[Invalid Roll: ${rollExpr}]</span>`;
+        }
+    });
+
+    // 5. Extract buttons (will be sent as separate messages)
+    let buttonInfo = extractButtons(processed);
+
+    return { text: buttonInfo.text, buttons: buttonInfo.buttonCommands };
 }
 
 /**
@@ -1540,10 +1960,18 @@ function getRandomMessage(messages) {
 
 /**
  * Triggers and displays an NPC message when proximity condition is met.
+ * Supports dynamic content:
+ * - {playerName} - Triggering character's first name
+ * - {monitoredName} - NPC's name
+ * - {playerName.hp} - Character attributes
+ * - {monitoredName.hp} - NPC's attributes
+ * - {1d6} - Dice rolls
+ * - [Text](message) - Clickable buttons (can include [[rolls]], whispers, API commands)
  * @param {MonitoredNPC} npc - The NPC that was triggered
  * @param {string} playerName - The name of the player who triggered the NPC
+ * @param {Graphic} triggeringToken - The token that triggered the NPC (optional, for attribute lookups)
  */
-function triggerNPCMessage(npc, playerName = "Guild Member") {
+function triggerNPCMessage(npc, playerName = "Guild Member", triggeringToken = null) {
     if (!npc || npc.mode == "off") return;
     if (npc.mode == "once") {
         npc.mode = "off";
@@ -1551,20 +1979,32 @@ function triggerNPCMessage(npc, playerName = "Guild Member") {
 
     let selectedMessage = getRandomMessage(npc.messages);
 
-    // Replace player name placeholder
-    let personalizedMessage = selectedMessage.content.replace(/{playerName}/g, playerName == "Guild Member" ? playerName : playerName.split(" ")[0]);
-
+    // Get default card style
     let defaultCardStyle = state.ProximityNPC.cardStyles.find(style => style.name === 'Default');
 
+    // Determine which card style to use (message > NPC > default)
     let cardStyle = defaultCardStyle;
 
     if (npc.cardStyle) {
-        cardStyle = state.ProximityNPC.cardStyles.find(style => style.name === npc.cardStyle);
+        cardStyle = state.ProximityNPC.cardStyles.find(style => style.name === npc.cardStyle) || defaultCardStyle;
     }
 
     if (selectedMessage.cardStyle) {
-        cardStyle = state.ProximityNPC.cardStyles.find(style => style.name === selectedMessage.cardStyle);
+        cardStyle = state.ProximityNPC.cardStyles.find(style => style.name === selectedMessage.cardStyle) || cardStyle;
     }
+
+    // Get display name (first name only) - full name comes from character object in processing
+    let displayName = playerName == "Guild Member" ? playerName : playerName.split(" ")[0];
+
+    // Process all dynamic content (rolls, attributes, buttons, playerName, monitoredName)
+    let messageInfo = processMessageDynamics(
+        selectedMessage.content,
+        displayName,
+        triggeringToken,
+        npc,
+        cardStyle,
+        defaultCardStyle
+    );
 
     // Build styled card - only show image if it exists
     let card = `<div style="background: ${cardStyle.backgroundColor || defaultCardStyle.backgroundColor}; border: 3px solid ${cardStyle.borderColor || defaultCardStyle.borderColor}; border-radius: 10px; padding: 15px; margin: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">` +
@@ -1575,12 +2015,41 @@ function triggerNPCMessage(npc, playerName = "Guild Member") {
         `<div style="position: absolute; top: -10px; left: 20px; width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 10px solid ${cardStyle.borderColor || defaultCardStyle.borderColor};"></div>` +
         `<div style="position: absolute; top: -7px; left: 21px; width: 0; height: 0; border-left: 9px solid transparent; border-right: 9px solid transparent; border-bottom: 9px solid ${cardStyle.bubbleColor};"></div>` +
         `<p style="margin: 0; color: ${cardStyle.textColor || defaultCardStyle.textColor}; font-size: 14px; line-height: 1.6; align-items: center;">${cardStyle.badge ? `<img src="` + cardStyle.badge + `" style="height: 20px; width: 20px; border: 3px solid ${cardStyle.borderColor || defaultCardStyle.borderColor}; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"> ` : ''}<strong>` + npc.name + `:</strong></p>` +
-        `<p style="margin: 8px 0 0 0; color: ${cardStyle.textColor || defaultCardStyle.textColor}; font-size: 14px; line-height: 1.6; font-style: italic;">` + personalizedMessage + `</p>` +
+        `<p style="margin: 8px 0 0 0; color: ${cardStyle.textColor || defaultCardStyle.textColor}; font-size: 14px; line-height: 1.6; font-style: italic;">` + messageInfo.text + `</p>` +
         `</div>` +
         `</div>`;
 
-    // Send as whisper to the player who triggered it
-    sendChat(npc.name, `${(cardStyle.whisper == 'off') ? '' : (cardStyle.whisper == 'character') ? `/w ${playerName} ` : '/w gm '}${card}`);
+    // Determine whisper mode
+    let whisperPrefix = (cardStyle.whisper == 'off') ? '' : (cardStyle.whisper == 'character') ? `/w ${playerName} ` : '/w gm ';
+
+    // Send the card
+    sendChat(npc.name, whisperPrefix + card);
+
+    // If there are buttons, send all as one Roll20 template card with multiple buttons
+    if (messageInfo.buttons && messageInfo.buttons.length > 0) {
+        // Build button fields for the template
+        let buttonFields = messageInfo.buttons.map((button, index) => {
+            // Create a unique button ID for this interaction
+            let buttonId = `${npc.name.replace(/\s+/g, '_')}_${Date.now()}_${index}`;
+
+            // Store button data in state for callback
+            if (!state.ProximityNPC.buttonCallbacks) {
+                state.ProximityNPC.buttonCallbacks = {};
+            }
+            state.ProximityNPC.buttonCallbacks[buttonId] = {
+                message: button.message,
+                whisper: whisperPrefix,
+                sender: npc.name
+            };
+
+            // Return button field for template
+            return `{{[${button.text}](!proximitynpc-button ${buttonId})}}`;
+        }).join(' ');
+
+        // Send all buttons as one Roll20 template card
+        let buttonTemplate = `&{template:default} {{name=${displayName}'s opportunities}} ${buttonFields}`;
+        sendChat(npc.name, whisperPrefix + buttonTemplate);
+    }
 }
 
 /**

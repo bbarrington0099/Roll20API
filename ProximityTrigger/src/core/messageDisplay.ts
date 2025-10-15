@@ -20,7 +20,7 @@ import { CardStyle } from '../classes/CardStyle.js';
 export function triggerNPCMessage(
     npc: MonitoredNPC,
     state: ProximityTriggerState,
-    playerName: string = 'Guild Member'
+    playerName: string = 'Triggerer'
 ): void {
     if (!npc || npc.mode === 'off') return;
 

@@ -76,7 +76,7 @@ export function getTokenEffectiveName(token: Graphic): string {
  * Returns the first name only for brevity in messages.
  * 
  * @param token - The token that triggered the interaction
- * @returns Player/character first name or "Guild Member"
+ * @returns Player/character first name or "Triggerer"
  */
 export function getPlayerNameFromToken(token: Graphic): string {
     const charId = token.get('represents');
@@ -84,10 +84,10 @@ export function getPlayerNameFromToken(token: Graphic): string {
         const character = getObj('character', charId) as Character | undefined;
         if (character) {
             const fullName = character.get('name');
-            return fullName.split(' ')[0] || 'Guild Member';
+            return fullName.split(' ')[0] || 'Triggerer';
         }
     }
-    return 'Guild Member';
+    return 'Triggerer';
 }
 
 /**

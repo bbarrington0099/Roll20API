@@ -53,7 +53,7 @@ export function personalizeMessage(
     playerName: string
 ): string {
     // Use first name only if full name provided
-    const firstName = playerName === 'Guild Member'
+    const firstName = playerName === 'Triggerer'
         ? playerName
         : playerName.split(' ')[0];
 
