@@ -54,7 +54,7 @@ export function checkAllProximities(
             const key = movedId + '_' + tokenId;
 
             if (distance <= threshold && !triggeredTokens[key]) {
-                triggerNPCMessage(npc, state, playerName);
+                triggerNPCMessage(npc, state, playerName, movedToken);
                 triggeredTokens[key] = true;
 
                 // Set timeout to clear the trigger

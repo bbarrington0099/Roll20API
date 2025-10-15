@@ -21,8 +21,14 @@ export function initializeState(): ProximityTriggerState {
             monitoredNPCs: {},
             cardStyles: [
                 new CardStyle('Default')
-            ]
+            ],
+            buttonCallbacks: {}
         };
+    }
+
+    // Ensure buttonCallbacks exists for existing state objects
+    if (!state.ProximityTrigger.buttonCallbacks) {
+        state.ProximityTrigger.buttonCallbacks = {};
     }
 
     return state.ProximityTrigger;

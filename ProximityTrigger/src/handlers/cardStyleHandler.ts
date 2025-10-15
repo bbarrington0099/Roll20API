@@ -76,7 +76,7 @@ export function handleCardStyle(msg: ChatMessage, state: ProximityTriggerState):
     }
 
     // Set the property value
-    const value = args.slice(4).join(' ').trim().toLowerCase();
+    const value = args.slice(4).join(' ').trim();
     setCardStyleProperty(msg, cardStyle, property, value);
 }
 
@@ -214,10 +214,11 @@ function setCardStyleProperty(
             );
             break;
         case 'whisper':
-            if (value === 'character' || value === 'gm' || value === 'off') {
-                cardStyle.whisper = value as 'character' | 'gm' | 'off';
+            const lowerWhisper = value.toLowerCase();
+            if (lowerWhisper === 'character' || lowerWhisper === 'gm' || lowerWhisper === 'off') {
+                cardStyle.whisper = lowerWhisper as 'character' | 'gm' | 'off';
                 sendChat('Proximity Trigger',
-                    `/w ${who} Updated ${cardStyle.name} whisper to "${value}"`
+                    `/w ${who} Updated ${cardStyle.name} whisper to "${lowerWhisper}"`
                 );
             } else {
                 cardStyle.whisper = 'off';

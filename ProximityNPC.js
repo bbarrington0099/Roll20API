@@ -1129,7 +1129,7 @@ function handleEditCardStyle(msg) {
         return;
     }
 
-    let value = args.slice(4).join(" ").trim().toLowerCase();
+    let value = args.slice(4).join(" ").trim();
 
     // Handle property-specific validation and setting
     switch (property) {
@@ -1151,9 +1151,10 @@ function handleEditCardStyle(msg) {
             break;
         case 'whisper':
             // Sanitize bad args - only allow 'character', 'gm', or 'off'
-            if (value === 'character' || value === 'gm' || value === 'off') {
-                cardStyle.whisper = value;
-                sendChat("NPC Monitor", `/w ${who} Updated ${cardStyle.name} whisper to "${value}"`);
+            let lowerWhisper = value.toLowerCase();
+            if (lowerWhisper === 'character' || lowerWhisper === 'gm' || lowerWhisper === 'off') {
+                cardStyle.whisper = lowerWhisper;
+                sendChat("NPC Monitor", `/w ${who} Updated ${cardStyle.name} whisper to "${lowerWhisper}"`);
             } else {
                 // Default to 'off' for invalid values
                 cardStyle.whisper = 'off';

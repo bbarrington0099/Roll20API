@@ -27,6 +27,21 @@ export function setupChatListener(state: ProximityTriggerState): void {
     on('chat:message', function (msg: ChatMessage) {
         const who = msg.who || 'gm';
 
+        // Handle button clicks from dynamic messages
+        if (msg.type === 'api' && msg.content.startsWith('!proximitytrigger-button')) {
+            const args = msg.content.trim().split(' ');
+            if (args.length > 1) {
+                const buttonId = args[1];
+                if (state.buttonCallbacks && state.buttonCallbacks[buttonId]) {
+                    const callback = state.buttonCallbacks[buttonId];
+                    sendChat(callback.sender, callback.whisper + callback.message);
+                    // Clean up the callback
+                    delete state.buttonCallbacks[buttonId];
+                }
+            }
+            return;
+        }
+
         // Only handle API commands that start with !pt
         if (msg.type !== 'api' || !msg.content.startsWith('!pt')) {
             return;

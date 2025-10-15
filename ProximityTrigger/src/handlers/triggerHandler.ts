@@ -4,7 +4,7 @@
  * Manually triggers an NPC message display.
  */
 
-import { getTokenFromCall, getTokenEffectiveName } from '../utils/tokenUtils.js';
+import { getTokenFromCall, getTokenEffectiveName, getPlayerNameFromToken } from '../utils/tokenUtils.js';
 import { toSafeName, fromSafeName } from '../utils/nameUtils.js';
 import { triggerNPCMessage } from '../core/messageDisplay.js';
 
@@ -20,6 +20,12 @@ export function handleTrigger(msg: ChatMessage, state: ProximityTriggerState): v
     const args = msg.content.trim().split(/\s+/);
     const token = getTokenFromCall(msg, fromSafeName);
 
+    // Get the selected token if any (for character attribute lookups)
+    let selectedToken: Graphic | null = null;
+    if (msg.selected && msg.selected.length > 0) {
+        selectedToken = getObj('graphic', msg.selected[0]._id) as Graphic | undefined || null;
+    }
+
     // If a token is selected → trigger its monitored NPC
     if (token) {
         const tokenName = getTokenEffectiveName(token);
@@ -33,7 +39,9 @@ export function handleTrigger(msg: ChatMessage, state: ProximityTriggerState): v
             return;
         }
 
-        triggerNPCMessage(monitoredNPC, state);
+        // Use selectedToken if available, otherwise use default
+        const playerName = selectedToken ? getPlayerNameFromToken(selectedToken) : 'Triggerer';
+        triggerNPCMessage(monitoredNPC, state, playerName, selectedToken);
         return;
     }
 
@@ -43,7 +51,8 @@ export function handleTrigger(msg: ChatMessage, state: ProximityTriggerState): v
         const monitoredNPC = state.monitoredNPCs[safeName];
 
         if (monitoredNPC) {
-            triggerNPCMessage(monitoredNPC, state);
+            const playerName = selectedToken ? getPlayerNameFromToken(selectedToken) : 'Triggerer';
+            triggerNPCMessage(monitoredNPC, state, playerName, selectedToken);
             return;
         }
     }

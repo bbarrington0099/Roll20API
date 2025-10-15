@@ -5,22 +5,32 @@
  * Works for NPCs, traps, environment effects, passive checks, and more.
  */
 
-import { getRandomMessage, personalizeMessage } from '../utils/messageUtils.js';
+import { getRandomMessage } from '../utils/messageUtils.js';
+import { processMessageDynamics } from '../utils/dynamicContent.js';
 import { MonitoredNPC } from '../classes/MonitoredNPC.js';
 import { CardStyle } from '../classes/CardStyle.js';
 
 /**
  * Triggers and displays an NPC message with styled card.
  * Handles mode changes (once → off) and applies appropriate styling.
+ * Supports dynamic content:
+ * - {playerName} - Triggering character's first name
+ * - {monitoredName} - NPC's name
+ * - {playerName.hp} - Character attributes
+ * - {monitoredName.hp} - NPC's attributes
+ * - {1d6} - Dice rolls
+ * - [Text](message) - Clickable buttons (can include [[rolls]], whispers, API commands)
  * 
  * @param npc - The NPC that was triggered
  * @param state - The ProximityTrigger state
  * @param playerName - The player who triggered the interaction
+ * @param triggeringToken - The token that triggered the message (for attribute lookups)
  */
 export function triggerNPCMessage(
     npc: MonitoredNPC,
     state: ProximityTriggerState,
-    playerName: string = 'Triggerer'
+    playerName: string = 'Triggerer',
+    triggeringToken: Roll20Graphic | null = null
 ): void {
     if (!npc || npc.mode === 'off') return;
 
@@ -30,7 +40,6 @@ export function triggerNPCMessage(
     }
 
     const selectedMessage = getRandomMessage(npc.messages);
-    const personalizedContent = personalizeMessage(selectedMessage.content, playerName);
 
     // Determine card style (priority: message override > NPC default > Default)
     const defaultCardStyle = state.cardStyles.find(style => style.name === 'Default');
@@ -51,13 +60,55 @@ export function triggerNPCMessage(
         cardStyle = new CardStyle('Default');
     }
 
+    // Get display name (first name only)
+    const displayName = playerName === 'Triggerer'
+        ? playerName
+        : playerName.split(' ')[0];
+
+    // Process all dynamic content (rolls, attributes, buttons, playerName, monitoredName)
+    const messageInfo = processMessageDynamics(
+        selectedMessage.content,
+        displayName,
+        triggeringToken,
+        npc,
+        cardStyle,
+        cardStyle
+    );
+
     // Build styled HTML card
-    const card = buildMessageCard(npc, personalizedContent, cardStyle, cardStyle);
+    const card = buildMessageCard(npc, messageInfo.text, cardStyle, cardStyle);
 
     // Determine whisper target
     const whisperPrefix = getWhisperPrefix(cardStyle.whisper, playerName);
 
+    // Send the card
     sendChat(npc.name, `${whisperPrefix}${card}`);
+
+    // If there are buttons, send all as one Roll20 template card with multiple buttons
+    if (messageInfo.buttons && messageInfo.buttons.length > 0) {
+        // Build button fields for the template
+        const buttonFields = messageInfo.buttons.map((button, index) => {
+            // Create a unique button ID for this interaction
+            const buttonId = `${npc.name.replace(/\s+/g, '_')}_${Date.now()}_${index}`;
+
+            // Store button data in state for callback
+            if (!state.buttonCallbacks) {
+                state.buttonCallbacks = {};
+            }
+            state.buttonCallbacks[buttonId] = {
+                message: button.message,
+                whisper: whisperPrefix,
+                sender: npc.name
+            };
+
+            // Return button field for template
+            return `{{[${button.text}](!proximitytrigger-button ${buttonId})}}`;
+        }).join(' ');
+
+        // Send all buttons as one Roll20 template card
+        const buttonTemplate = `&{template:default} {{name=${displayName}'s opportunities}} ${buttonFields}`;
+        sendChat(npc.name, `${whisperPrefix}${buttonTemplate}`);
+    }
 }
 
 /**
@@ -103,7 +154,7 @@ function buildMessageCard(
         `<div class="${nameForClass}card-dialog-bubble-arrow" style="position: absolute; top: -7px; left: 21px; width: 0; height: 0; ` +
         `border-left: 9px solid transparent; border-right: 9px solid transparent; ` +
         `border-bottom: 9px solid ${bubbleColor};"></div>` +
-        `<p class="${nameForClass}card-dialog-bubble-speaker" style="margin: 0; color: ${textColor}; font-size: 14px; line-height: 1.6; align-items: center;">${badgeUrl ? `<img src="` + badgeUrl + `" style="height: 20px; width: 20px; border: 3px solid ${borderColor}; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"> ` : ''}">` +
+        `<p class="${nameForClass}card-dialog-bubble-speaker" style="margin: 0; color: ${textColor}; font-size: 14px; line-height: 1.6; align-items: center;">${badgeUrl ? `<img src="` + badgeUrl + `" style="height: 20px; width: 20px; border: 3px solid ${borderColor}; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"> ` : ''}` +
         `<strong>${npc.name}:</strong></p>` +
         `<p class="${nameForClass}card-dialog-bubble-content" style="margin: 8px 0 0 0; color: ${textColor}; font-size: 14px; ` +
         `line-height: 1.6; font-style: italic;">${messageContent}</p>` +
