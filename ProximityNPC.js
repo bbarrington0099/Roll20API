@@ -115,15 +115,15 @@ state.ProximityNPC = {
                 new MessageObject('The Guild Master looks up, you see a look of intense thought clear from his eyes. "Ah {playerName}, I hope you\'re keeping your wits sharp; I\'ve got some jobs coming up for you."', 3),
                 new MessageObject('Tharos nods at you, "Good to see you again, {playerName}. Remember, the guild is always here if you need assistance."', 3),
                 new MessageObject('"Tempus favors the bold, {playerName}, but he also favors the prepared. Make sure you\'re both before heading out." He taps Ruinbreaker\'s haft thoughtfully.', 2),
-                new MessageObject('His booming laugh echoes through the hall. "That reminds me of the time I faced that wyvern! Though you didn\'t hear it from me..."', 1),
+                new MessageObject('His booming laugh echoes through the hall. "That reminds me of the time I faced that wyvern! The story has become legend by all the bards over the years, but have I ever told you about how I barely escaped with my life?"', 1),
                 // Relationship messages
-                new MessageObject('"Keoti came from the army with the highest of recommendations, my former battle body claimed that he had "Never seen a tabaxi move so fast with a greataxe" - he\'s earned every bit of trust I place in him."', 2),
-                new MessageObject('"When Risha tried to steal Ruinbreaker, I nearly threw her in the dungeons. But after realizing what she\'d done to it... brilliant. Sometimes second chances create our strongest allies."', 2),
+                new MessageObject('"Keoti came from the army with the highest of recommendations, my former battle buddy claimed that he had \'Never seen a tabaxi move so fast with a greataxe\' - he\'s earned every bit of trust I place in him."', 2),
+                new MessageObject('"When Risha tried to steal Ruinbreaker, I nearly threw her in the dungeons. But after realizing what she\'d done to it... brilliant! Sometimes second chances create our strongest allies."', 2),
                 new MessageObject('"Ilikan may be our groundskeeper, but he has the patience of the giants who raised him. The guild wouldn\'t be standing without his careful maintenance."', 1),
-                // New messages with dynamic features
-                new MessageObject('"Let me see your stance, {playerName}. Show me your readiness! [Practice Attack]({playerName} demonstrates their form for Tharos. "Good form!")"', 2),
-                new MessageObject('"Your current health at {playerName.hp} is decent, but in the wilds, every point counts. [Ask for Healing](w Caelum Riversong {playerName} could use some healing from {monitoredName}\'s recommendation) [Tough It Out]({playerName} decides to press on with {playerName.hp} HP)"', 1),
-                new MessageObject('"I\'ve faced beasts that could swallow a man whole! Roll to see if you believe my tale: {1d20} - under 10 and you think I\'m exaggerating!"', 1),
+                // Messages with dynamic features
+                new MessageObject('"Let me see your stance, {playerName}. Show me your readiness! [Practice Attack]({playerName} demonstrates their form for Tharos who dances along with it readily. "Good form!")"', 2),
+                new MessageObject('"In the wilds, every bandage counts." [Ask for Healing](w Caelum Riversong {playerName} could use some healing from {monitoredName}\'s recommendation) [Tough It Out]({playerName} decides to press on with {playerName.hp} HP)', 1),
+                new MessageObject('"I\'ve faced beasts that could swallow a man whole!" You\'ve heard his tales, but the truth is often even stranger. Rolled: {1d20}. [10 or higher](You know the horrifying truths behind what he is writing off so casually.) [Below 10](You remain unaware of the darker realities behind his stories.)', 1),
                 new MessageObject('"The guild stands at your back, {playerName}. Remember our strength when you face the darkness ahead."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/TharosRaggenthraw.png',
@@ -139,16 +139,13 @@ state.ProximityNPC = {
                 new MessageObject('"Sometimes the strongest healing happens over a good drink and better company. You look like you could use both."', 1),
                 // Relationship messages
                 new MessageObject('"Lumen reminds me of myself at his age - so much heartache, but such determination. I make sure he gets extra sweets when Keoti isn\'t looking."', 2),
-                new MessageObject('"Bolagor and I have an arrangement - my best ale for his spiciest stew. The resulting feast nearly brought Tharos to tears last Winter\'s Crest."', 2),
-                new MessageObject('"Snek once tried to help me serve drinks. We lost three mugs and gained a wonderful story. That kobold means well, even when he\'s a disaster."', 1),
-                // Example dynamic content messages
-                new MessageObject('"Looking a bit rough there, {playerName}. You\'re at {playerName.hp} health - let me pour you something restorative." [Accept Drink](w {playerName} You drink deeply and feel slightly better)', 0.5),
-                new MessageObject('"Roll for a drinking contest!" She slides a mug across the bar. You rolled: {1d20+3}! "Not bad, {playerName}!"', 0.5),
-                // New messages with dynamic features
-                new MessageObject('"That wound looks nasty, {playerName}. At {playerName.hp} HP, you should be more careful! [Get Proper Healing](w Caelum Riversong {playerName} needs medical attention) [Take a Risk]({playerName} decides to tough it out with {playerName.hp} HP)"', 2),
-                new MessageObject('"Let\'s play a game of chance! Roll a d20: {1d20}. Over 15 and your next drink is on the house!"', 1),
-                new MessageObject('"You seem burdened, {playerName}. Sometimes sharing helps lighten the load. [Share a Secret](w {playerName} You confide in Kinris) [Keep to Yourself]({playerName} politely declines to share)"', 1),
-                new MessageObject('"My special brew can put some fire in your belly! Let\'s see how you handle it - roll constitution {1d20}!"', 1)
+                new MessageObject('"Bolagor and I have an arrangement - my best ale for his spiciest stew. The resulting feast nearly brought Tharos to tears last Winter."', 2),
+                new MessageObject('"Snek once tried to help me serve drinks. We lost three mugs and gained a wonderful story. That kobold means well, even when his intentions lead to disaster."', 1),
+                // Messages with dynamic features
+                new MessageObject('"Very few members can go pour for pour with me on this Giant\'s Ale." She slides a mug across the bar. Rolled: {1d20 - 2}. [Lower than 17](You\'re instantly regretting that last round.) [17 or higher](You feel like you could take on the world after that round.)', 0.5),
+                new MessageObject('"A discount?! Let\'s flip a coin for it, I call heads!" Rolled: {1d2}. [On a 2](Your drink is half priced) [On a 1](You pay double).', 1),
+                new MessageObject('"You seem burdened, {playerName}. Sometimes sharing helps lighten the load. [Share a Secret](You confide in Kinris) [Keep to Yourself]({playerName} politely declines to share)"', 1),
+                new MessageObject('"My special brew can put some fire in your belly!" Roll a Con save DC 15. [Success](You gain resistance to fire damage for one day) [Fail](You rush to the bathroom, praying to Tempus that there is mercy.)', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/KinrisMorranfew.png',
             'Coal Rank'
@@ -159,17 +156,16 @@ state.ProximityNPC = {
             [
                 new MessageObject('His head turns towards you but his eyes remain pinned to a thick tome... "Questions about my book? Oh for you {playerName} I\'ll even sign it."', 3),
                 new MessageObject('The boy is quite well in his studies, you\'d be foolish to underestimate him in sparring {playerName}', 2),
-                new MessageObject('"Fascinating! {playerName}, come look at this passage - it perfectly describes the hunting patterns of the very creature you faced last week!"', 2),
+                new MessageObject('"Fascinating! {playerName}, come look at this passage - it perfectly describes the hunting patterns of a pack of gnolls!"', 2),
                 new MessageObject('He looks up, startled as if waking from a dream. "Oh! {playerName}, I was just... how long have I been reading?"', 1),
                 // Relationship messages
                 new MessageObject('"Young Auren has a mind for graviturgy that I haven\'t seen in decades. Last week he corrected my calculations on feather fall... he was right, of course."', 2),
-                new MessageObject('"Jade and I compiled the guild archives together. Her memory for detail is... unsettlingly good. Former spies make excellent librarians."', 2),
+                new MessageObject('"Jade and I compiled the guild archives together. Her memory for detail is... unsettlingly good. Former spies make excellent record keepers it turns out."', 2),
                 new MessageObject('"Fiona once helped me track a fey-touched beast for my research. Her connection to both drake and fey wilds made the difference between success and disaster."', 1),
-                // New messages with dynamic features
-                new MessageObject('"Your intellectual curiosity is noted, {playerName}. Let\'s test your knowledge with a simple puzzle!"', 2),
-                new MessageObject('"Research can be dangerous! I once got quite hurt from an enchanted book. [Ask About Research](w {playerName} Ovlan shares research safety tips) [Share Your Story]({playerName} tells {monitoredName} about their own research mishaps)"', 1),
-                new MessageObject('"This scroll details defensive spells that could boost your armor class from {playerName.ac}. [Study Scroll](w {playerName} You learn defensive techniques from Ovlan\'s scroll) [Continue Research]({playerName} thanks Ovlan but continues their own studies)"', 1),
-                new MessageObject('"The arcane arts require precision, {playerName}. Let me demonstrate a basic cantrip - watch closely!"', 1)
+                // Messages with dynamic features
+                new MessageObject('"Your intellectual curiosity is noted, {playerName}. Let\'s test your knowledge with a simple puzzle!" Roll a Int save DC 12. [Success](You solve the puzzle with ease) [Fail](You feel your mind throbbing and take [[1d6]] psychic damage)', 2),
+                new MessageObject('"Research can be dangerous! I once got quite hurt from an enchanted book. [Ask About Research](Ovlan shares research safety tips) [Share Your Story]({playerName} tells {monitoredName} about their own \'research\' mishaps)"', 1),
+                new MessageObject('"The arcane arts require precision, {playerName}. Let me demonstrate a basic cantrip - watch closely!" Ovlan casts the most powerful form of Prestidigitation {playerName} has ever seen, cleaning the entire library in an instance.', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/OvlanKalek.png',
             'Silver Rank'
@@ -178,7 +174,7 @@ state.ProximityNPC = {
             'Varon Tavis',
             2,
             [
-                new MessageObject('"You\'re welcome to use the forge, there\'s an extra hammer on the wall there." He points to a long line of hanging hammers.', 3),
+                new MessageObject('"You\'re welcome to use the forge {playerName}, there\'s an extra hammer on the wall there." He points to a long line of hanging hammers.', 3),
                 new MessageObject('"Steel doesn\'t lie, {playerName}. It shows every flaw and every strength. People could learn from that."', 2),
                 new MessageObject('"This blade needs more tempering. Show me your grip, {playerName} - proper form saves fingers."', 2),
                 new MessageObject('"In the wilds, a dull blade gets you killed. Here, it just gets you a lecture from me." He almost smiles.', 1),
@@ -186,11 +182,10 @@ state.ProximityNPC = {
                 new MessageObject('"Tharos gave me a place when my own clan wouldn\'t. I\'d break every hammer in this forge before I betrayed that trust."', 2),
                 new MessageObject('"Risha\'s \'improvements\' to my tools usually work, eventually. The exploding tongs were... educational." He rubs a faint scar on his arm.', 2),
                 new MessageObject('"Ilikan understands materials - wood, stone, metal. We repaired the main gate together after that ogre incident. Good worker."', 1),
-                // New messages with dynamic features
-                new MessageObject('"Your armor could use maintenance, {playerName}. At {playerName.ac} AC, you\'re decently protected, but I can improve it. [Request Armor Repair](w gm {playerName} requests armor maintenance from Varon) [Decline Offer]({playerName} decides their {playerName.ac} AC is sufficient)"', 2),
-                new MessageObject('"Let\'s test your metalworking knowledge. See if you can identify this alloy by its weight and color."', 1),
-                new MessageObject('"I got badly burned from a forge accident once. Safety first in my smithy. [Learn Safety](w {playerName} Varon teaches forge safety) [Share Experience]({playerName} tells Varon about their own crafting experiences)"', 1),
-                new MessageObject('"The heat of the forge reminds me of battle. Both can leave scars, but both make us stronger."', 1)
+                // Messages with dynamic features
+                new MessageObject('"Let\'s test your metalworking knowledge. See if you can identify this alloy by its weight and color." Rolled: {2d8}. [Higher than 8](Varon is very impressed.) [8 or lower](Varon looks puzzled by your answer.)', 1),
+                new MessageObject('"I got badly burned from a forge accident once. Safety first in my smithy. [Learn Safety](Varon teaches forge safety) [Share Experience]({playerName} tells Varon about their own crafting experiences)"', 1),
+                new MessageObject('"The heat of the forge is a lot like battle. Both can leave scars, but both make us stronger."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/VaronTavis.png',
             'Coal Rank'
@@ -200,18 +195,18 @@ state.ProximityNPC = {
             2,
             [
                 new MessageObject('"Ah, {playerName}, careful with that bandage. Let me show you a proper technique—your hands could save lives yet."', 3),
-                new MessageObject('"My research is going well {playerName}, but I really need our shippment of exotic herbs and oils from Kantra to come in..." You now notice a new crate of emty vial awaiting their contents.', 2),
+                new MessageObject('"My research is going well {playerName}, but I really need our shipment of exotic herbs and oils from Kantra to come in..." You now notice a new crate of empty vials awaiting their contents.', 2),
                 new MessageObject('"Lathander\'s light guide your path, {playerName}. And if it doesn\'t, my poultices will have to suffice."', 2),
                 new MessageObject('"Precision saves lives, {playerName}. Whether in surgery or spellcasting, the principle remains."', 1),
                 // Relationship messages
                 new MessageObject('"Ilikan and I often pray to Lathander together at dawn. His giant-taught prayers have a... grounding quality to them."', 2),
                 new MessageObject('"Kinris supplies me with the strongest spirits for disinfecting wounds. Her brew stings worse than any monster\'s bite, but it works."', 2),
                 new MessageObject('"I treated Fiona\'s drake when it ate something it shouldn\'t have. Remarkable creature - even its digestive troubles were impressive."', 1),
-                // New messages with dynamic features
-                new MessageObject('"By Lathander\'s grace, let me check your condition. You have {playerName.hp} HP remaining. [Request Healing](w gm {playerName} requests healing from Caelum) [Refuse Aid]({playerName} declines healing despite having {playerName.hp} HP)"', 3),
+                // Messages with dynamic features
                 new MessageObject('"This poultice should help with minor wounds. Let me show you how to apply it properly."', 2),
-                new MessageObject('"I\'ve seen wounds that would make a lesser person fall. The worst was from a wyvern\'s sting. [Ask About Treatment](w {playerName} Caelum explains advanced wound care) [Share Experience]({playerName} describes their own healing experiences)"', 1),
-                new MessageObject('"Every sunrise brings new hope for healing, {playerName}. Remember that when your spirits are low."', 1)
+                new MessageObject('"I\'ve seen wounds that would make a lesser person fall. The worst was from a wyvern\'s sting. [Ask About Treatment](Caelum explains advanced wound care) [Share Experience]({playerName} describes their own healing experiences)"', 1),
+                new MessageObject('"Every sunrise brings new hope for healing, {playerName}. Remember that when your spirits are low."', 1),
+                new MessageObject('He looks very busy mixing compounds and reviewing notes as you approach. "Ah {playerName}, perfect timing! Can you hand me that poison siphon leaf over there?" Roll a Nature check DC {1d4 + 8}. [Success](Caelum carefully extracts and mixes in the oil taken from the leaf, afterwards handing you a Potion of \'Potion of Cure Poison\') [Fail](You select an open container of leaves and begin uncontrollably sneezing for the next hour with Caelum shaking his head in amusement.)', 2)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/CaelumRiversong.png',
             'Coal Rank'
@@ -225,13 +220,12 @@ state.ProximityNPC = {
                 new MessageObject('"This gadget nearly took my finger off, but the principle is sound! Come look, {playerName}!"', 2),
                 new MessageObject('"Rules are just suggestions written by people who lacked imagination, {playerName}."', 1),
                 // Relationship messages
-                new MessageObject('"Tharos could have had me hanged. Instead he saw potential in my \'modifications\' to his axe. Never told him I was just trying to lighten it to steal faster."', 2),
+                new MessageObject('"Tharos could have had me hanged. Instead he saw my potential. Never told him I was just trying to up the value before fencing it off."', 2),
                 new MessageObject('"Varon grumbles about my \'tinkering\' but he\'s the first to test my new designs. We built a self-sharpening whetstone that actually works... mostly."', 2),
                 new MessageObject('"Snek brings me the most interesting scrap metal he finds. Half of it\'s junk, but that other half... pure inspiration."', 1),
-                // New messages with dynamic features
-                new MessageObject('"Let\'s make something explode! Well, not really... unless you want to? Care to help with this delicate work?"', 2),
-                new MessageObject('"I could improve your gear! Your current {playerName.ac} AC is decent, but I can make it better. [Request Modification](w gm {playerName} asks Risha to modify their equipment) [Keep Current Gear]({playerName} decides to stick with their {playerName.ac} AC)"', 1),
-                new MessageObject('"This device misfired and gave me quite a shock! Worth it for the breakthrough! [Ask About Invention](w {playerName} Risha explains her latest creation) [Share Idea]({playerName} suggests an invention to Risha)"', 1),
+                // Messages with dynamic features
+                new MessageObject('"Let\'s make something explode! Well, not really... unless you want to? Care to help with this delicate work?" [Offer Help]({playerName} offers to assist Risha with her invention. Rolled: [[1d20]]. [Lower than 13](Around 30 minutes in, a small boom can be heard throughout the Guildhall and you take [[1d4]] thunder damage as soot covers your face and your ears ring.)) [Decline Help]({playerName} declines to assist Risha, knowing how things can go in her very \'reinforced\' workshop.)', 2),
+                new MessageObject('"This device misfired and gave me quite a shock! Worth it for the breakthrough! [Ask About Invention](Risha explains her latest creation) [Share Idea]({playerName} suggests an invention to Risha)"', 1),
                 new MessageObject('"They said my crossbow modifications were impossible. I said they lacked vision. Guess who was right?"', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/RishaSwiftdancer.png',
@@ -241,19 +235,19 @@ state.ProximityNPC = {
             'Lumen Silverflock',
             1.5,
             [
-                new MessageObject('A mug crashes against the wall near you. "I\'ll get that cleaned up, {playerName}. Don\'t worry, I move a mop as well as a sword."', 1),
-                new MessageObject('You notice Lumn feigning attacks with an invisible sword. "Master Keoti says there\s alway time to practice"', 3),
+                new MessageObject('A mug crashes against the wall near you. "I\'ll get that cleaned up, {playerName}. Don\'t worry, I move a mop as well as I do a sword."', 1),
+                new MessageObject('You notice Lumen feigning attacks with an invisible sword. "Master Keoti says there\'s always time to practice."', 3),
                 new MessageObject('"Kelemvor teaches that every life deserves justice, {playerName}. That\'s why I train so hard."', 2),
                 new MessageObject('"Could you show me that parry again, {playerName}? I want to get it perfect before Master Keoti returns."', 2),
                 // Relationship messages
                 new MessageObject('"Master Keoti found me practicing alone one night and just... started teaching me. He doesn\'t say much, but he shows me everything."', 2),
                 new MessageObject('"Kinris lets me help in the kitchen sometimes. She says I remind her of... well, she gets quiet after that. But she\'s always kind."', 2),
                 new MessageObject('"The guild party that rescued me... I don\'t remember all their names, but Tharos was there. His mane was the first thing I saw in the ruins."', 1),
-                // New messages with dynamic features
+                // Messages with dynamic features
                 new MessageObject('"I\'ve been practicing my attacks! Watch this - I\'m getting better every day. [Offer Training]({playerName} shows Lumen a combat technique) [Watch Practice]({playerName} watches Lumen train)"', 2),
-                new MessageObject('"Master Keoti says I should check if people are hurt. You have {playerName.hp} HP - are you feeling okay? [Admit Injury](w Caelum Riversong {playerName} admits they need healing) [Reassure Lumen]({playerName} tells Lumen they\'re fine with {playerName.hp} HP)"', 1),
-                new MessageObject('"I did well on my history test yesterday! Ovlan said I\'m improving. [Ask About Studies](w {playerName} Lumen shares what he\'s learning) [Encourage Studies]({playerName} encourages Lumen\'s education)"', 1),
-                new MessageObject('"Justice doesn\'t care about age, {playerName}. Even I can help make things right."', 1)
+                new MessageObject('"I did well on my history test yesterday! Ovlan said I\'m improving. [Ask About Studies](Lumen shares what he\'s learning) [Encourage Studies]({playerName} encourages Lumen\'s education)"', 1),
+                new MessageObject('"Justice doesn\'t care about age, {playerName}. Even I can help make things right."', 1),
+                new MessageObject('You see Lumen uncharacteristically confused. "{playerName}, can you help me with understanding how to do these calculations Ovlan gave me?" Roll an Intelligence save DC 12. [Success](Lumen quickly grasps the concept and thanks you profusely) [Fail](He sighs and says "That\'s what I thought too, but Ovlan said it wasn\'t quite right.")', 2)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/LemunSilverflock.png',
             'Copper Rank'
@@ -267,13 +261,13 @@ state.ProximityNPC = {
                 new MessageObject('"My master always said: good food makes good fighters. So eat up, {playerName} - we need you strong."', 2),
                 new MessageObject('"This stew has three different peppers from the eastern markets. Care to test your mettle, {playerName}?"', 1),
                 // Relationship messages
-                new MessageObject('"Jade and I handle the guild\'s finances. She negotiates contracts, I handle supplies. Between us, we keep this place from bankruptcy."', 2),
+                new MessageObject('"Jade and I handle the guild\'s finances. She balances the books, I ensure negotiations keep us within budget. Between us, we keep this place from bankruptcy."', 2),
                 new MessageObject('"Kinris and I have a standing bet on who can create the more... memorable beverage. Last time, her ale made a dwarf cry. I respect that."', 2),
                 new MessageObject('"Little Auren is the only one who remembers every ingredient in my seven-pepper stew. Sharp mind, that one."', 1),
-                // New messages with dynamic features
-                new MessageObject('"This stew will restore your strength! Good food is the best medicine. [Try the Stew](w gm {playerName} tries Bolagor\'s special stew) [Politely Decline]({playerName} declines the spicy offering)"', 2),
-                new MessageObject('"Let\'s see how well you haggle! I learned from the best merchants in the land."', 1),
-                new MessageObject('"I once set my apron on fire from an over-spiced pan. The kitchen is as dangerous as the hunt! [Ask Cooking Tips](w {playerName} Bolagor shares cooking wisdom) [Share Kitchen Story]({playerName} tells Bolagor about their own cooking experiences)"', 1),
+                // Messages with dynamic features
+                new MessageObject('"This stew will restore your strength! Good food is the best medicine. [Try the Stew]({playerName} tries Bolagor\'s special stew) [Politely Decline]({playerName} declines the spicy offering)"', 2),
+                new MessageObject('"Let\'s see how well you haggle! I learned from the best merchants in the land." Roll a Charisma save DC {1d6 + 11}. [Success](Bolagor smirks "Oh you\'d be one to walk away with what wasn\'t even for sale huh, {playerName}.") [Fail](He narrows his eyes and says "Maybe let one of your friends handle your coin.")', 1),
+                new MessageObject('"I once set my apron on fire from an over-spiced pan. The kitchen is as dangerous as the hunt! [Ask Cooking Tips]({playerName} Bolagor shares cooking wisdom) [Share Kitchen Story]({playerName} tells Bolagor about their own cooking experiences)"', 1),
                 new MessageObject('"Good food fuels good fighters, {playerName}. Never underestimate a proper meal before battle."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/BolagorBonejaw.png',
@@ -287,16 +281,16 @@ state.ProximityNPC = {
                 new MessageObject('"Tymora smiles on the prepared, {playerName}. What kind of quests would you like me to look out for?"', 2),
                 new MessageObject('"Looking for advice on certain aspects of adventuring, {playerName}?" You can almost sense the usefulness this conversation could have.', 2),
                 new MessageObject('"Diplomacy first, blades if necessary. That was my motto in the field, and it serves well here too."', 1),
-                new MessageObject('She looks up at you from the papers she\'s going over meticulously, "Keep striving to rank up, and build your reputation here, you\'re one of the best to write about."', 1),
+                new MessageObject('She looks up at you from the papers she\'s going over meticulously, "Keep striving to rank up, and build your reputation here, you\'re one of my favorite reports to read."', 1),
                 // Relationship messages
-                new MessageObject('"Ovlan and I compiled the guild archives together. His memory for arcane lore is matched only by mine for... well, let\'s call it professional details."', 2),
-                new MessageObject('"Bolagor drives the hardest bargain I\'ve seen since my espionage days. I rather enjoy our negotiations - it keeps me sharp."', 2),
+                new MessageObject('"Ovlan and I compiled the guild archives together. His memory for arcane lore is unmatched even by mine..."', 2),
+                new MessageObject('"Bolagor drives the hardest bargain I\'ve seen since my espionage days. I rather enjoy sitting in on his negotiations - it keeps me sharp."', 2),
                 new MessageObject('"Who comes to me for stories of my adventuring days. She says they make good songs. I suppose everyone deserves a legend, even former spies."', 1),
-                // New messages with dynamic features
+                // Messages with dynamic features
                 new MessageObject('"Let me check the quest records for someone of your capabilities... I keep detailed notes on all our members."', 2),
-                new MessageObject('"Your current health at {playerName.hp} HP suggests you should consider appropriate challenge levels. [Request Safer Quests](w gm {playerName} asks Jade for less dangerous missions) [Accept Any Challenge]({playerName} tells Jade they can handle anything)"', 1),
-                new MessageObject('"In my field days, I got quite injured from a fey trap once. Retirement has its perks. [Ask About Past](w {playerName} Jade shares an adventuring story) [Share Your Story]({playerName} tells Jade about their own dangerous encounters)"', 1),
-                new MessageObject('"Tymora favors those who plan ahead, {playerName}. Always have an exit strategy."', 1)
+                new MessageObject('"In my field days, I got quite injured from a fey trap once. Retirement has its perks." [Ask About Past](Jade shares an adventuring story) [Share Your Story]({playerName} tells Jade about their own dangerous encounters)', 1),
+                new MessageObject('"Tymora favors those who plan ahead, {playerName}. Always have an exit strategy."', 1),
+                new MessageObject('"Want to practice your decoding skills? Here\'s a cipher I used in the field." Rolled: {2d10}. [Lower than 11](You read the message to Jade outloud, after which she cocks her head and says "Not quite {playerName}, maybe give that some more thought.") [11 or Higher]("Impressive, I\'ll have to keep an eye on my personal records when you\'re around.")', 2)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/JadeClearrock.png',
             'Iron Rank'
@@ -313,10 +307,9 @@ state.ProximityNPC = {
                 new MessageObject('"Ilikan proposed to me during the great meteor shower. He said each falling star was a promise for our future. My practical husband has his moments of poetry."', 2),
                 new MessageObject('"Auren gets his curiosity from me, but his patience from his father. Between us, we\'re raising quite the remarkable young man."', 2),
                 new MessageObject('"Snek helps me with the smaller creatures. They trust him in a way they don\'t trust most people. There\'s a pure heart beneath that chatter."', 1),
-                // New messages with dynamic features
-                new MessageObject('"Let\'s see if you have a way with beasts! This young griffon seems to like you already."', 2),
-                new MessageObject('"My drake could teach you about defense - your current {playerName.ac} AC is good, but observation helps. [Watch Drake](w {playerName} Fiona\'s drake demonstrates defensive moves) [Share Technique]({playerName} shows Fiona a defensive technique)"', 1),
-                new MessageObject('"I once got badly wounded protecting my drake from a manticore. Worth every scar. [Ask About Drake](w {playerName} Fiona shares how she met her drake companion) [Share Beast Story]({playerName} tells Fiona about their own beast encounters)"', 1),
+                // Messages with dynamic features
+                new MessageObject('"Let\'s see if you have a way with beasts! This young griffon seems to like you already." Roll a Animal Handling check DC {1d6 + 12}. [Success](You successfully befriend the griffon) [Fail](The griffon remains wary)', 2),
+                new MessageObject('"I once got badly wounded protecting my drake from a manticore. Worth every scar. [Ask About Drake](Fiona shares how she met her drake companion) [Share Beast Story]({playerName} tells Fiona about their own beast encounters)"', 1),
                 new MessageObject('"The wilds speak to those who listen, {playerName}. My drake seems to think you\'re worth listening to."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/FionaMirage.png',
@@ -328,16 +321,15 @@ state.ProximityNPC = {
             [
                 new MessageObject('"Everything in its place, {playerName}. Care to help repair this table leg? You\'ll learn a thing or two."', 3),
                 new MessageObject('"My giant-kin taught me: every avalanche begins as a single pebble. Good work starts small, {playerName}."', 2),
-                new MessageObject('"Lathander\'s dawn reminds us that even broken things can be made new. This armor just needs patience, {playerName}."', 2),
+                new MessageObject('"Lathander\'s dawn reminds us that even broken things can be made new. These flowers just need patience, {playerName}."', 2),
                 new MessageObject('"The gardens need tending, {playerName}. There\'s peace in working with the earth - care to join me?"', 1),
                 // Relationship messages
                 new MessageObject('"Fiona still has the wild fey spark that drew me to her, but now it\'s tempered by motherhood. Our son has her brilliant mind and, thankfully, my patience."', 2),
                 new MessageObject('"Caelum and I share dawn prayers to Lathander. He tends to souls while I tend to the earth, but we both serve renewal in our ways."', 2),
                 new MessageObject('"I teach Auren Giant not just for language, but for perspective. The world looks different when you understand how giants think."', 1),
-                // New messages with dynamic features
-                new MessageObject('"Let\'s test your repair skills! This shield needs careful mending."', 2),
-                new MessageObject('"Your gear looks worn - at {playerName.ac} AC, you could use some maintenance. [Request Repairs](w gm {playerName} asks Ilikan to repair their equipment) [DIY Approach]({playerName} decides to handle their own {playerName.ac} AC maintenance)"', 1),
-                new MessageObject('"I got hurt from a falling beam during hall repairs last year. Safety matters in all work. [Learn Safety](w {playerName} Ilikan shares construction safety tips) [Share Work Story]({playerName} tells Ilikan about their own work experiences)"', 1),
+                // Messages with dynamic features
+                new MessageObject('"Let\'s test your repair skills! This curtain needs careful mending." Roll a Sleight of Hand check DC {1d8 + 8}. [Success](You successfully mend the curtain) [Fail](The curtain remains damaged)', 2),
+                new MessageObject('"I got hurt from a falling beam during hall repairs last year. Safety matters in all work. [Learn Safety](Ilikan shares construction safety tips) [Share Work Story]({playerName} tells Ilikan about their own work experiences)"', 1),
                 new MessageObject('"Lathander\'s light reveals what needs mending, both in our halls and in our hearts."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/IlikanWildfist.png',
@@ -353,13 +345,13 @@ state.ProximityNPC = {
                 new MessageObject('"I\'ve been practicing my serving posture. Is my form correct, {playerName}?"', 1),
                 // Relationship messages
                 new MessageObject('"Mother lets me help with the baby griffons sometimes. She says I have her way with creatures, but I think they just like the treats I sneak them."', 2),
-                new MessageObject('"Master Ovlan says I\'m his best student, but I think he says that to all his apprentices. Still, it makes me want to work harder."', 2),
+                new MessageObject('"Master Ovlan says I\'m the best student he\'s had, but I bet he\'s said that to all his apprentices. Still, it makes me want to work harder."', 2),
                 new MessageObject('"Father says our family follows Lathander because every morning is a new beginning. I like that - it means I can always try again tomorrow."', 1),
-                // New messages with dynamic features
-                new MessageObject('"I can carry several plates without dropping them! Watch! [Test Balance](w {playerName} Auren demonstrates his serving skills) [Offer Help]({playerName} helps Auren with his duties)"', 2),
-                new MessageObject('"You look like you have {playerName.hp} HP - are you hungry? I can get you something from the kitchen! [Accept Food](w Bolagor Bonejaw {playerName} requests food through Auren) [Decline Politely]({playerName} thanks Auren but declines)"', 1),
-                new MessageObject('"I did well on my magic test yesterday! Master Ovlan said I\'m improving. [Ask About Studies](w {playerName} Auren shares his magical studies) [Encourage Learning]({playerName} encourages Auren\'s education)"', 1),
-                new MessageObject('"Service is an honor, {playerName}. Father says every task done well makes the guild stronger."', 1)
+                // Messages with dynamic features
+                new MessageObject('"I can carry several plates without dropping them! Watch! [Test Balance](Auren demonstrates his serving skills) [Offer Help]({playerName} helps Auren with his duties)"', 2),
+                new MessageObject('"I did well on my magic test yesterday! Master Ovlan said I\'m improving. [Ask About Studies](Auren shares his magical studies) [Encourage Learning]({playerName} encourages Auren\'s education)"', 1),
+                new MessageObject('"Service is an honor, {playerName}. Father says every task done well makes the guild stronger."', 1),
+                new MessageObject('"{playerName}, do you mind if I test this new spell on you? It shouldn\'t hurt." Roll a Strength save DC 12. [Success](You withstand the minor gravitational pulse Auren casts, feeling a slight tug but no harm) [Fail](You stumble as Auren\'s spell momentarily increases your weight, causing you to fall prone as Auren quickly apologizes and helps you to your feet.)', 2)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/AurenWildfist.png',
             'Coal Rank'
@@ -370,16 +362,14 @@ state.ProximityNPC = {
             [
                 new MessageObject('Keoti\'s amber eyes meet yours, sharp as a blade. "Stay alert, {playerName}. Let me know of any trouble."', 3),
                 new MessageObject('"Sehanine guides us through dreams and darkness both, {playerName}. Trust your instincts as you would her moonlight."', 2),
-                new MessageObject('"I\'ve walked your patrol route, {playerName}. Report anything unusual immediately."', 2),
                 new MessageObject('"The scar teaches what the victory forgets, {playerName}. Learn from both."', 1),
                 // Relationship messages
                 new MessageObject('"Lumen trains harder than soldiers twice his age. The boy carries grief like armor, but I\'m teaching him to wear it like a cloak instead."', 2),
-                new MessageObject('"Tharos and I served in different companies during the war, but we shared the same nightmares. Only difference is, he built a guild while I found a god."', 2),
+                new MessageObject('"Tharos may have served years before me, but I\'ve always felt we share the same nightmares. Only difference is, he built a guild while I found a god."', 2),
                 new MessageObject('"I patrol with Fiona\'s drake sometimes. The creature sees things even I miss. Useful partner, if you don\'t mind the shedding."', 1),
-                // New messages with dynamic features
-                new MessageObject('"Show me your defensive stance. Your {playerName.ac} AC suggests you understand protection, but form matters. [Request Training](w {playerName} Keoti offers combat training) [Demonstrate Form]({playerName} shows Keoti their defensive techniques)"', 2),
-                new MessageObject('"A guard must notice what others miss. Let me test your awareness."', 1),
-                new MessageObject('"I got badly wounded holding the line at Riverbend. Some scars remind us why we fight. [Ask About Service](w {playerName} Keoti shares a war story) [Share Battle Story]({playerName} tells Keoti about their own battle experiences)"', 1),
+                // Messages with dynamic features
+                new MessageObject('"A guard must notice what others miss. Let me test your awareness." Roll a Perception check DC {1d8 + 9} [Success](You notice a piece of cloth stuffed in the lock on a window) [Fail](Keoti points to a window, "That lock has been tampered with, anyone could sneak in.")', 1),
+                new MessageObject('"I got badly wounded holding the line at Riverbend. Some scars remind us why we fight. [Ask About Service](Keoti shares a war story) [Share Battle Story]({playerName} tells Keoti about their own battle experiences)"', 1),
                 new MessageObject('"Sehanine\'s moonlight reveals truths the sun cannot see. Remember that when your path seems dark."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/KeotiFang.png',
@@ -394,13 +384,12 @@ state.ProximityNPC = {
                 new MessageObject('"Tymora must be smiling on us today, {playerName}! I found an extra shiny coin by the stables!"', 2),
                 new MessageObject('"I\'m not supposed to tell anyone, but since it\'s you, {playerName}..." He immediately proceeds to share everything.', 1),
                 // Relationship messages
-                new MessageObject('"Fiona lets me help with the animals! Well, the small ones. The big ones step on me sometimes. But the rabbits love me!"', 2),
-                new MessageObject('"Who sings the prettiest songs! I try to remember the words but they get mixed up. She says it\'s the feeling that matters anyway."', 2),
+                new MessageObject('"Fiona lets me help with the animals! Well, the small ones. The big ones sit on me sometimes."', 2),
+                new MessageObject('"Who sings the prettiest songs! I try to remember the words but they get mixed up, but she says it\'s the feeling that matters anyway."', 2),
                 new MessageObject('"Kinris is my favorite! She gives me the leftover fruit from her brewing and never gets mad when I spill things. Well, not TOO mad."', 1),
-                // New messages with dynamic features
+                // Messages with dynamic features
                 new MessageObject('"Let\'s play a game! Try to catch this message bird - he\'s very fast!"', 2),
-                new MessageObject('"I heard you have {playerName.hp} HP! That\'s... good, right? [Explain Health](w {playerName} {playerName} explains HP to Snek) [Change Subject]({playerName} quickly changes the subject from their {playerName.hp} HP)"', 1),
-                new MessageObject('"I once tripped over my own tail and got quite a bruise! Tymora must have been laughing. [Share Embarrassment](w {playerName} Snek shares more clumsy stories) [Tell Your Story]({playerName} tells Snek about their own embarrassing moments)"', 1),
+                new MessageObject('"I heard of this game called two truths and a lie, want to play?" Roll an Insight check DC {1d4 + 16} [Success](You are able to sort out which claims seem the most grounded in reality... somehow) [Fail](None of these details even go together... you question everything you know about Snek)', 1),
                 new MessageObject('"The birds say the weather will be nice tomorrow! Or was it rainy? I get their chirps mixed up sometimes."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/SnekLittlefoot.png',
@@ -418,11 +407,12 @@ state.ProximityNPC = {
                 new MessageObject('"Jade tells the most amazing stories from her adventuring days! I\'m turning her escape from the Shadow Guild into an epic ballad."', 2),
                 new MessageObject('"Auren and I practice serving together. For a nine-year-old, he has remarkable rhythm. I think he\'d make a fine bard if wizardry doesn\'t work out."', 2),
                 new MessageObject('"Tharos took a chance on a street performer, and now I have a home. I write songs about his wyvern fight, but I make the ending happier than it really was."', 1),
-                // New messages with dynamic features
+                // Messages with dynamic features
                 new MessageObject('"Let me play you something uplifting! Music can lift the heaviest spirits."', 2),
-                new MessageObject('"This song is about healing - it might help restore your energy! [Listen Closely](w {playerName} Who performs her healing song) [Request Different Song]({playerName} asks Who for a different type of music)"', 1),
-                new MessageObject('"I once got hurt from a broken lute string! The high E is dangerous when it snaps. [Ask About Music](w {playerName} Who shares musician stories) [Share Performance Story]({playerName} tells Who about their own performance experience)"', 1),
-                new MessageObject('"Tymora guides my fingers on the strings, {playerName}. Every note is a chance for beauty."', 1)
+                new MessageObject('"This song is about healing - it might help restore your energy! [Listen Closely](Who performs her healing song) [Request Different Song]({playerName} asks Who for a different type of music)"', 1),
+                new MessageObject('"I once got hurt from a broken lute string! The high E is dangerous when it snaps. [Ask About Music](Who shares musician stories) [Share Performance Story]({playerName} tells Who about their own performance experience)"', 1),
+                new MessageObject('"Tymora guides my fingers on the strings, {playerName}. Every note is a chance for beauty."', 1),
+                new MessageObject('You notice Who looking a bit distracted as she tunes her lute. "Oh, {playerName}, could you help me figure out this tuning? I think I\'m a bit off." Roll a Performance check DC 12. [Success](You help Who get the perfect pitch, and she beams with gratitude) [Fail](Who sighs, "Close enough, I suppose. Maybe Tymora will forgive my mistakes today.")', 2)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/WhoWingfall.png',
             'Coal Rank'
@@ -489,9 +479,10 @@ state.ProximityNPC = {
         new CardStyle('Silver Rank', '#c0c0c0', '#f8f8f8', '#ffffff', '#303030', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/silver_rank.png'),
         new CardStyle('Gold Rank', '#ffd700', '#fff8dc', '#fffaf0', '#5a4300', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/gold_rank.png'),
         new CardStyle('Platinum Rank', '#e5e4e2', '#fefefe', '#ffffff', '#222222', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/platinum_rank.png'),
-        new CardStyle('Mithral Rank', '#7fd4ff', '#e6f7ff', '#f0fbff', '#00334d', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/mithral_rank.png')
+        new CardStyle('Mithral Rank', '#7fd4ff', '#e6f7ff', '#f0fbff', '#00334d', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/mithral_rank.png'),
+        new CardStyle('Enemy', '#8b0000', '#3b0000', '#660000', '#ffe5e5', 'off')
     ]
-
+    
 }
 
 // Track which tokens have already triggered to avoid spam
