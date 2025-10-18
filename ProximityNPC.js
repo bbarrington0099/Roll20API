@@ -107,6 +107,7 @@ state.ProximityNPC = {
     defaultImagePath: '',
     defaultDistance: 2,
     buttonCallbacks: {},
+    monitoredNPCs: {},
     presetNPCs: [
         new PresetNPC(
             'Tharos Raggenthraw',
@@ -122,7 +123,6 @@ state.ProximityNPC = {
                 new MessageObject('"Ilikan may be our groundskeeper, but he has the patience of the giants who raised him. The guild wouldn\'t be standing without his careful maintenance."', 1),
                 // Messages with dynamic features
                 new MessageObject('"Let me see your stance, {playerName}. Show me your readiness! [Practice Attack]({playerName} demonstrates their form for Tharos who dances along with it readily. "Good form!")"', 2),
-                new MessageObject('"In the wilds, every bandage counts." [Ask for Healing](w Caelum Riversong {playerName} could use some healing from {monitoredName}\'s recommendation) [Tough It Out]({playerName} decides to press on with {playerName.hp} HP)', 1),
                 new MessageObject('"I\'ve faced beasts that could swallow a man whole!" You\'ve heard his tales, but the truth is often even stranger. Rolled: {1d20}. [10 or higher](You know the horrifying truths behind what he is writing off so casually.) [Below 10](You remain unaware of the darker realities behind his stories.)', 1),
                 new MessageObject('"The guild stands at your back, {playerName}. Remember our strength when you face the darkness ahead."', 1)
             ],
@@ -302,15 +302,15 @@ state.ProximityNPC = {
                 new MessageObject('Fiona crouches beside her drake companion, who nudges you gently. "Mind your step, {playerName}, and say hello properly to my friend there."', 3),
                 new MessageObject('"Selûne\'s phases guide all creatures, {playerName}. Even the wildest beast has its rhythms and reasons."', 2),
                 new MessageObject('"The griffons need extra grooming today, {playerName}. Care to help? They quite like you."', 2),
-                new MessageObject('"My drake remembers you, {playerName}. They don\'t forget kindness, no matter how small."', 1),
+                new MessageObject('"Sylvash remembers you, {playerName}. They don\'t forget kindness, no matter how small."', 1),
                 // Relationship messages
                 new MessageObject('"Ilikan proposed to me during the great meteor shower. He said each falling star was a promise for our future. My practical husband has his moments of poetry."', 2),
                 new MessageObject('"Auren gets his curiosity from me, but his patience from his father. Between us, we\'re raising quite the remarkable young man."', 2),
                 new MessageObject('"Snek helps me with the smaller creatures. They trust him in a way they don\'t trust most people. There\'s a pure heart beneath that chatter."', 1),
                 // Messages with dynamic features
                 new MessageObject('"Let\'s see if you have a way with beasts! This young griffon seems to like you already." Roll a Animal Handling check DC {1d6 + 12}. [Success](You successfully befriend the griffon) [Fail](The griffon remains wary)', 2),
-                new MessageObject('"I once got badly wounded protecting my drake from a manticore. Worth every scar. [Ask About Drake](Fiona shares how she met her drake companion) [Share Beast Story]({playerName} tells Fiona about their own beast encounters)"', 1),
-                new MessageObject('"The wilds speak to those who listen, {playerName}. My drake seems to think you\'re worth listening to."', 1)
+                new MessageObject('"I once got badly wounded protecting Sylvash from a manticore. Worth every scar. [Ask About Drake](Fiona shares how she met her drake companion) [Share Beast Story]({playerName} tells Fiona about their own beast encounters)"', 1),
+                new MessageObject('"The wilds speak to those who listen, {playerName}. Sylvash seems to think you\'re worth listening to."', 1)
             ],
             'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/staffImages/FionaMirage.png',
             'Gold Rank'
@@ -438,7 +438,7 @@ state.ProximityNPC = {
                 new MessageObject('"Sweet dreams lately, {playerName}?"', 2),
                 new MessageObject('"“Every action leaves its echo in time, {playerName}. Best we choose our steps with care.”', 2),
                 new MessageObject('"“I remember the first time you spoke in my dreams. I thought you were a curse. Now I know you\'re my compass.”', 1),
-                new MessageObject('"“The others think I talk to ghosts. Let them. You\'re more real to me than they\'ll ever understand.”', 1)
+                new MessageObject('"“What do you mean that barmaid thought I was odd? I just wanted to spread the word of Labelas. You\'re being so uptight right now... Oh sorry {playerName}, I didn\'t see you there.”', 1)
             ],
             'https://files.d20.io/images/459909611/OFJdlRki_OurTvZvS7tLkA/med.jpg?1760213725',
             'Copper Rank'
@@ -468,6 +468,62 @@ state.ProximityNPC = {
             ],
             'https://files.d20.io/images/460447956/6zI5Bg298MEFRs0FnakYlQ/med.jpg?1760584645',
             'Copper Rank'
+        ),
+        new PresetNPC(
+            'Krak of the Frostmarch Company',
+            2,
+            [
+                new MessageObject('“Keep watching, brother. Someone\'s got to make sure I don\'t do anything stupid. Oh, {playerName}, sorry I wasn\'t talking to you.”', 1),
+                new MessageObject('“I don\'t pray. Not to gods, not to ghosts. I\'ve seen what answers.”', 2),
+                new MessageObject('“You\'ve never known real cold till it bites your bones from the inside.”', 2),
+                new MessageObject('“The cold\'s fair, at least. Don\'t care who you are, just if you can last.”', 1),
+                new MessageObject('“Zrar always said: \'If you\'re not bleeding, you\'re lazy.\' Can\'t say I disagree.”', 2),
+                new MessageObject('“The Frostmarch don\'t make heroes. It makes bones.”', 3)
+            ],
+            'https://files.d20.io/images/460649554/8fbRcgLsCIdLAqMEmDkdtw/med.jpg?1760744616',
+            'Copper Rank'
+        ),
+        new PresetNPC(
+            'Yedros',
+            3,
+            [
+                new MessageObject("A slow exhale of mist escapes Yedros\'s jaws, frost drifting through the air — calm approval resonates in the silence.", 1, null),
+                new MessageObject("The temperature drops sharply as faint cracks of ice echo beneath her — a warning settles in the stillness, patient and cold.", 1, null),
+                new MessageObject("A deep rumble rolls from her chest, steady as a glacier\'s heart — contentment flows through the bond like a frozen current.", 1, null),
+                new MessageObject("A shimmer of frost creeps across her scales; her eyes narrow to slits of pale blue — disapproval, restrained but clear.", 1, null),
+                new MessageObject("The air stills entirely; frost swirls in slow orbit around her — unwavering resolve radiates, colder than the wind.", 1, null),
+                new MessageObject("A faint crack forms in the ice beneath her, the sound hollow and distant — sorrow drifts through the bond like falling snow.", 0.5, null),
+                new MessageObject("Her breath clouds the air in slow, gentle waves — warmth, rare and quiet, touches your mind with glacial tenderness.", 0.5, null)
+            ],
+            'https://files.d20.io/images/460643387/RvUHgYIYBOdG2-ymnWZaDA/med.jpg?1760741939',
+            'Companion'
+        ),
+        new PresetNPC(
+            'Sylvash',
+            4,
+            [
+                new MessageObject("A rumbling growl builds in Sylvash\'s chest, sparks flickering between her teeth — pride burns bright in her gaze.", 1, null),
+                new MessageObject("A sharp huff sends a wave of heat through the air; smoke curls from her nostrils as impatience radiates from her stance.", 1, null),
+                new MessageObject("A low, molten hum vibrates through the bond, warmth pulsing like a heartbeat — reassurance and confidence intertwine.", 1, null),
+                new MessageObject("She lets out a brief crackle of flame, the edges of her wings glowing — amusement flares like a spark on dry tinder.", 1, null),
+                new MessageObject("A roar erupts, scattering ash and heat; her tail slams the ground with thunderous force — rage and fierce protection surge together.", 1, null),
+                new MessageObject("A dim ember glows faintly in her throat, her body trembling with low heat — fear disguised as anger flickers beneath the surface.", 0.5, null),
+                new MessageObject("The firelight softens around her, and her eyes dim to a gentle gold — affection radiates like a quiet hearth in the dark.", 0.5, null)
+            ],
+            'https://files.d20.io/images/460647081/_FIC2z86wGfGBONdQM_qXw/med.jpg?1760743569',
+            'Companion'
+        ),
+        new PresetNPC(
+            'Sabaak of the Frostmarch Company',
+            2,
+            [
+                new MessageObject("The frost doesn’t care if you live or die, but I do — so keep moving.", 1, null),
+                new MessageObject("A sharp tune and a sharper blade — that’s how we survive in the Frostmarch.", 1, null),
+                new MessageObject("Zrar would’ve scolded me for staying alive this long… but I prefer lessons over loss.", 1, null),
+                new MessageObject("Every step in the snow is borrowed time; make it count, or the cold will take it back.", 1, null)
+            ],
+            'https://files.d20.io/images/460661567/ZonPfnDyw2VwB3XrY_JRLQ/med.jpg?1760750136',
+            'Copper Rank'
         )
     ],
     monitoredNPCs: {},
@@ -477,12 +533,13 @@ state.ProximityNPC = {
         new CardStyle('Copper Rank', '#b87333', '#ffe5b4', '#fff2e0', '#4a2c00', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/copper_rank.png'),
         new CardStyle('Iron Rank', '#5a5a5a', '#d8d8d8', '#f5f5f5', '#1e1e1e', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/iron_rank.png'),
         new CardStyle('Silver Rank', '#c0c0c0', '#f8f8f8', '#ffffff', '#303030', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/silver_rank.png'),
-        new CardStyle('Gold Rank', '#ffd700', '#fff8dc', '#fffaf0', '#5a4300', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/gold_rank.png'),
+        new CardStyle('Gold Rank', '#d3af37', '#fff8dc', '#fffaf0', '#5a4300', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/gold_rank.png'),
         new CardStyle('Platinum Rank', '#e5e4e2', '#fefefe', '#ffffff', '#222222', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/platinum_rank.png'),
         new CardStyle('Mithral Rank', '#7fd4ff', '#e6f7ff', '#f0fbff', '#00334d', 'off', 'https://studionimbus.dev/Projects/AlabastriaCharacterAssistant/rankImages/mithral_rank.png'),
+        new CardStyle('Companion', '#2e8b57', '#d0f0c0', '#a8e6a3', '#1a3d2c', 'off'),
         new CardStyle('Enemy', '#8b0000', '#3b0000', '#660000', '#ffe5e5', 'off')
     ]
-    
+
 }
 
 // Track which tokens have already triggered to avoid spam
